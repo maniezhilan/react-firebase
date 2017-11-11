@@ -1,4 +1,4 @@
-# react-redux-firebase Complete Material Example
+# Krabby platform based of react-redux-firebase and Material UI
 
 [![License][license-image]][license-url]
 [![Code Style][code-style-image]][code-style-url]
