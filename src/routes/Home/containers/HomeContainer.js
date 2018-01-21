@@ -16,8 +16,8 @@ import Snackbar from 'material-ui/Snackbar'
 import { List } from 'material-ui/List'
 import Paper from 'material-ui/Paper'
 import Subheader from 'material-ui/Subheader'
-import TodoItem from '../components/TodoItem'
-import NewTodoPanel from '../components/NewTodoPanel'
+import Product from '../components/Product'
+import NewProductPanel from '../components/NewProductPanel'
 import classes from './HomeContainer.scss'
 
 // const populates = [{ child: 'owner', root: 'users', keyProp: 'uid' }]
@@ -25,14 +25,14 @@ import classes from './HomeContainer.scss'
 @firebaseConnect([
   // 'todos' // sync full list of todos
   // { path: 'todos', type: 'once' } // for loading once instead of binding
-  { path: 'todos', queryParams: ['orderByKey', 'limitToLast=5'] } // 10 most recent
+  { path: 'products', queryParams: ['orderByKey', 'limitToLast=5'] } // 10 most recent
   // { path: 'todos', populates } // populate
   // { path: 'todos', storeAs: 'myTodos' } // store elsewhere in redux
 ])
 @connect(({ firebase }) => ({
   auth: pathToJS(firebase, 'auth'),
   account: pathToJS(firebase, 'profile'),
-  todos: dataToJS(firebase, 'todos')
+  products: dataToJS(firebase, 'products'),
   // todos: orderedToJS(firebase, 'todos') // if looking for array
   // todos: dataToJS(firebase, 'myTodos'), // if using storeAs
   // todos: populatedDataToJS(firebase, 'todos', populates), // if populating
@@ -40,7 +40,7 @@ import classes from './HomeContainer.scss'
 }))
 export default class Home extends Component {
   static propTypes = {
-    todos: PropTypes.oneOfType([
+    products: PropTypes.oneOfType([
       PropTypes.object, // object if using dataToJS
       PropTypes.array // array if using orderedToJS
     ]),
@@ -52,7 +52,11 @@ export default class Home extends Component {
     }),
     auth: PropTypes.shape({
       uid: PropTypes.string
-    })
+    }),
+    uploadedFiles: PropTypes.oneOfType([
+      PropTypes.object, // object if using dataToJS
+      PropTypes.array // array if using orderedToJS
+    ])
   }
 
   state = {
@@ -64,41 +68,46 @@ export default class Home extends Component {
     if (!auth || !auth.uid) {
       return this.setState({ error: 'You must be Logged into Toggle Done' })
     }
-    return firebase.set(`/todos/${id}/done`, !todo.done)
+    return firebase.set(`/products/${id}/done`, !product.done)
   }
 
-  deleteTodo = id => {
-    const { todos, auth, firebase } = this.props
+  deleteProduct = id => {
+    const { products, auth, firebase } = this.props
     if (!auth || !auth.uid) {
       return this.setState({ error: 'You must be Logged into Delete' })
     }
     // return this.setState({ error: 'Delete example requires using populate' })
     // only works if populated
-    if (todos[id].owner !== auth.uid) {
-      return this.setState({ error: 'You must own todo to delete' })
+    if (products[id].owner !== auth.uid) {
+      return this.setState({ error: 'You must own product to delete' })
     }
-    return firebase.remove(`/todos/${id}`).catch(err => {
-      console.error('Error removing todo: ', err) // eslint-disable-line no-console
-      this.setState({ error: 'Error Removing todo' })
+    return firebase.remove(`/products/${id}`).catch(err => {
+      console.error('Error removing product: ', err) // eslint-disable-line no-console
+      this.setState({ error: 'Error Removing product' })
       return Promise.reject(err)
     })
   }
 
-  handleAdd = newTodo => {
+  handleAdd = newProduct => {
     // Attach user if logged in
     if (this.props.auth) {
-      newTodo.owner = this.props.auth.uid
+      newProduct.owner = this.props.auth.uid
     } else {
-      newTodo.owner = 'Anonymous'
+      newProduct.owner = 'Anonymous'
     }
+
+    if(newProduct.price === undefined) {
+    	newProduct.price = '';
+    }
+
     // attach a timestamp
-    newTodo.createdAt = this.props.firebase.database.ServerValue.TIMESTAMP
+    newProduct.createdAt = this.props.firebase.database.ServerValue.TIMESTAMP
     // using this.props.firebase.pushWithMeta here instead would automatically attach createdBy and createdAt
-    return this.props.firebase.push('/todos', newTodo)
+    return this.props.firebase.push('/products', newProduct)
   }
 
   render() {
-    const { todos } = this.props
+    const { products } = this.props
     const { error } = this.state
 
     return (
@@ -119,26 +128,25 @@ export default class Home extends Component {
             <a href="https://krabby-2017.firebaseio.com/">Krabby Platform</a>
           </span>
           <span style={{ marginTop: '2rem' }}>
-            <strong>Note: </strong>
-            old data is removed
+            <strong>Manage your products </strong>
           </span>
         </div>
-        <div className={classes.todos}>
-          <NewTodoPanel onNewClick={this.handleAdd} disabled={false} />
-          {!isLoaded(todos) ? (
+        <div className={classes.products}>
+          <NewProductPanel onNewClick={this.handleAdd} disabled={false} />
+          {!isLoaded(products) ? (
             <CircularProgress />
           ) : (
             <Paper className={classes.paper}>
-              <Subheader>Todos</Subheader>
+              <Subheader>Products</Subheader>
               <List className={classes.list}>
-                {todos &&
-                  map(todos, (todo, id) => (
-                    <TodoItem
+                {products &&
+                  map(products, (product, id) => (
+                    <Product
                       key={id}
                       id={id}
-                      todo={todo}
+                      product={product}
                       onCompleteClick={this.toggleDone}
-                      onDeleteClick={this.deleteTodo}
+                      onDeleteClick={this.deleteProduct}
                     />
                   ))}
               </List>

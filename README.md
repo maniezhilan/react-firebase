@@ -110,3 +110,7 @@ For more options on CI settings checkout the [firebase-ci docs](https://github.c
 [license-url]: https://github.com/testuser/material/blob/master/LICENSE
 [code-style-image]: https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat-square
 [code-style-url]: http://standardjs.com/
+
+
+Credits:
+1.https://github.com/react-dropzone/react-dropzone/tree/master/examples/Basic

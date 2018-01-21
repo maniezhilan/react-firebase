@@ -30,6 +30,7 @@
     "prop-types": "^15.5.10",
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
+    "react-dropzone": "^4.2.1",
     "react-google-button": "^0.3.0",
     "react-redux": "^5.0.4",
     "react-redux-firebase": "latest",
