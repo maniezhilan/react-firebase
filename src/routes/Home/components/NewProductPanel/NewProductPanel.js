@@ -13,12 +13,17 @@ export default class NewProductPanel extends Component {
 
   constructor() {
     super()
-    this.state = {disabled: false}
+    this.state = {id:null,disabled: false}
   }
 
   static propTypes = {
     onNewClick: PropTypes.func,
+    onEditClick: PropTypes.func,
     disabled: PropTypes.bool
+  }
+
+  handleEdit =(product) => {
+    console.log('product', '-------',product);
   }
 
 
@@ -36,9 +41,10 @@ export default class NewProductPanel extends Component {
 
 
   render() {
-    const { disabled} = this.props
+    const { product, disabled} = this.props
 
     return (
+
       <Paper className={classes.container}>
         <Subheader>New Product</Subheader>
         <div className={classes.inputSection}>

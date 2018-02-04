@@ -40,7 +40,8 @@ export default class Signup extends Component {
     // Logs user in after creation
     return createUser(creds, {
       email: creds.email,
-      username: creds.username
+      username: creds.username,
+      rolename: 'user'
     })
   }
 
@@ -63,10 +64,10 @@ export default class Signup extends Component {
         <Paper className={classes.panel}>
           <SignupForm onSubmit={this.handleSignup} />
         </Paper>
-        <div className={classes.or}>or</div>
-        <div className={classes.providers}>
+        {/* <div className={classes.or}>or</div> */}
+        {/* <div className={classes.providers}>
           <GoogleButton onClick={() => this.providerLogin('google')} />
-        </div>
+        </div> */}
         <div className={classes.login}>
           <span className={classes.loginLabel}>Already have an account?</span>
           <Link className={classes.loginLink} to={LOGIN_PATH}>

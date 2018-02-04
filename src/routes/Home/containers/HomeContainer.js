@@ -20,6 +20,7 @@ import Product from '../components/Product'
 import NewProductPanel from '../components/NewProductPanel'
 import classes from './HomeContainer.scss'
 
+
 // const populates = [{ child: 'owner', root: 'users', keyProp: 'uid' }]
 
 @firebaseConnect([
@@ -51,7 +52,8 @@ export default class Home extends Component {
       database: PropTypes.oneOfType([PropTypes.object, PropTypes.func])
     }),
     auth: PropTypes.shape({
-      uid: PropTypes.string
+      uid: PropTypes.string,
+      email: PropTypes.string
     }),
     uploadedFiles: PropTypes.oneOfType([
       PropTypes.object, // object if using dataToJS
@@ -63,7 +65,7 @@ export default class Home extends Component {
     error: null
   }
 
-  toggleDone = (todo, id) => {
+  toggleDone = (product, id) => {
     const { firebase, auth } = this.props
     if (!auth || !auth.uid) {
       return this.setState({ error: 'You must be Logged into Toggle Done' })
@@ -78,9 +80,9 @@ export default class Home extends Component {
     }
     // return this.setState({ error: 'Delete example requires using populate' })
     // only works if populated
-    if (products[id].owner !== auth.uid) {
-      return this.setState({ error: 'You must own product to delete' })
-    }
+    //if (products[id].owner !== auth.uid) {
+      //return this.setState({ error: 'You must own product to delete' })
+    //}
     return firebase.remove(`/products/${id}`).catch(err => {
       console.error('Error removing product: ', err) // eslint-disable-line no-console
       this.setState({ error: 'Error Removing product' })
@@ -88,7 +90,21 @@ export default class Home extends Component {
     })
   }
 
+
+  // editProduct = (product, id) => {
+  //   const { products, auth, firebase } = this.props
+  //   if (!auth || !auth.uid || !auth.rolename === 'admin') {
+  //     return this.setState({ error: 'You must be Logged into Add' })
+  //   }
+  //   console.log(product,id);
+  //   this.setState(product)
+  // }
+
   handleAdd = newProduct => {
+  	const { products, auth, firebase } = this.props
+    if (!auth || !auth.uid || !auth.rolename === 'admin') {
+      return this.setState({ error: 'You must be Logged into Add' })
+    }
     // Attach user if logged in
     if (this.props.auth) {
       newProduct.owner = this.props.auth.uid
@@ -109,6 +125,8 @@ export default class Home extends Component {
   render() {
     const { products } = this.props
     const { error } = this.state
+    const { account} = this.props
+    const { product} = this.props
 
     return (
       <div
@@ -132,11 +150,14 @@ export default class Home extends Component {
           </span>
         </div>
         <div className={classes.products}>
-          <NewProductPanel onNewClick={this.handleAdd} disabled={false} />
-          {!isLoaded(products) ? (
-            <CircularProgress />
-          ) : (
-            <Paper className={classes.paper}>
+
+          {account && account.rolename === 'admin' &&
+            <NewProductPanel onNewClick={this.handleAdd} disabled={false} /> 
+            //<NewProductPanel onEditClick={this.editProduct} disabled={false} />
+        }
+          
+         
+          <Paper className={classes.paper}>
               <Subheader>Products</Subheader>
               <List className={classes.list}>
                 {products &&
@@ -145,13 +166,15 @@ export default class Home extends Component {
                       key={id}
                       id={id}
                       product={product}
+                      account={account}
                       onCompleteClick={this.toggleDone}
                       onDeleteClick={this.deleteProduct}
+                      onEditClick={this.editProduct}
                     />
                   ))}
               </List>
             </Paper>
-          )}
+        
         </div>
       </div>
     )

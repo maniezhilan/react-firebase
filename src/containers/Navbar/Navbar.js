@@ -77,7 +77,7 @@ export default class Navbar extends Component {
           </div>
           <div className={classes['avatar-text']}>
             <span className={`${classes['avatar-text-name']} hidden-mobile`}>
-              {account && account.displayName ? account.displayName : 'User'}
+              {account && account.username ? account.username : 'User'}
             </span>
             <DownArrow color="white" />
           </div>

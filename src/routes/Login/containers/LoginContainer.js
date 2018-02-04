@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router'
-import GoogleButton from 'react-google-button'
 import Paper from 'material-ui/Paper'
 import Snackbar from 'material-ui/Snackbar'
 
@@ -57,10 +56,7 @@ export default class Login extends Component {
         <Paper className={classes.panel}>
           <LoginForm onSubmit={this.handleLogin} />
         </Paper>
-        <div className={classes.or}>or</div>
-        <div className={classes.providers}>
-          <GoogleButton onClick={() => this.providerLogin('google')} />
-        </div>
+       
         <div className={classes.signup}>
           <span className={classes.signupLabel}>Need an account?</span>
           <Link className={classes.signupLink} to={SIGNUP_PATH}>

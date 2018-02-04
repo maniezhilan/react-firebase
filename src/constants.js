@@ -1,4 +1,4 @@
-export const LIST_PATH = '/projects'
+export const LIST_PATH = '/'
 export const DETAIL_PATH = ':projectname'
 export const ACCOUNT_PATH = '/account'
 export const LOGIN_PATH = '/login'
