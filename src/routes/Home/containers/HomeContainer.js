@@ -18,6 +18,7 @@ import Paper from 'material-ui/Paper'
 import Subheader from 'material-ui/Subheader'
 import Product from '../components/Product'
 import NewProductPanel from '../components/NewProductPanel'
+import EditProductDialog from '../components/EditProductDialog'
 import classes from './HomeContainer.scss'
 
 
@@ -62,7 +63,9 @@ export default class Home extends Component {
   }
 
   state = {
-    error: null
+    error: null,
+    editProductModal: false,
+    product: null
   }
 
   toggleDone = (product, id) => {
@@ -70,7 +73,7 @@ export default class Home extends Component {
     if (!auth || !auth.uid) {
       return this.setState({ error: 'You must be Logged into Toggle Done' })
     }
-    return firebase.set(`/products/${id}/done`, !product.done)
+    //return firebase.set(`/products/${id}/done`, !product.done)
   }
 
   deleteProduct = id => {
@@ -78,27 +81,13 @@ export default class Home extends Component {
     if (!auth || !auth.uid) {
       return this.setState({ error: 'You must be Logged into Delete' })
     }
-    // return this.setState({ error: 'Delete example requires using populate' })
-    // only works if populated
-    //if (products[id].owner !== auth.uid) {
-      //return this.setState({ error: 'You must own product to delete' })
-    //}
+    
     return firebase.remove(`/products/${id}`).catch(err => {
       console.error('Error removing product: ', err) // eslint-disable-line no-console
       this.setState({ error: 'Error Removing product' })
       return Promise.reject(err)
     })
   }
-
-
-  // editProduct = (product, id) => {
-  //   const { products, auth, firebase } = this.props
-  //   if (!auth || !auth.uid || !auth.rolename === 'admin') {
-  //     return this.setState({ error: 'You must be Logged into Add' })
-  //   }
-  //   console.log(product,id);
-  //   this.setState(product)
-  // }
 
   handleAdd = newProduct => {
   	const { products, auth, firebase } = this.props
@@ -122,12 +111,48 @@ export default class Home extends Component {
     return this.props.firebase.push('/products', newProduct)
   }
 
+  handleEdit = editProduct => {
+    const { products, auth, firebase } = this.props
+    if (!auth || !auth.uid || !auth.rolename === 'admin') {
+      return this.setState({ error: 'You must be Logged into Add' })
+    }
+    // Attach user if logged in
+    if (this.props.auth) {
+      editProduct.owner = this.props.auth.uid
+    } else {
+      editProduct.owner = 'Anonymous'
+    }
+
+    if (editProduct.price === undefined) {
+      editProduct.price = '';
+    }
+
+    // attach a timestamp
+    editProduct.createdAt = this.props.firebase.database.ServerValue.TIMESTAMP
+    // using this.props.firebase.pushWithMeta here instead would automatically attach createdBy and createdAt
+    //return this.props.firebase.push('/products', editProduct)
+  }
+
+  displayProduct = (product, id) => {
+    const { firebase, auth } = this.props
+    if (!auth || !auth.uid) {
+      return this.setState({ error: 'You must be Logged into Toggle Done' })
+    }
+ 
+    this.setState({ editProductModal: !this.state.editProductModal})
+    this.setState((prevState) => {
+      return { product: product }
+    });
+    console.log('-----', this.state)
+  }
+
   render() {
     const { products } = this.props
     const { error } = this.state
     const { account} = this.props
-    const { product} = this.props
-
+    const { editProductModal } = this.state
+    const { product } = this.state
+    
     return (
       <div
         className={classes.container}
@@ -151,11 +176,24 @@ export default class Home extends Component {
         </div>
         <div className={classes.products}>
 
-          {account && account.rolename === 'admin' &&
-            <NewProductPanel onNewClick={this.handleAdd} disabled={false} /> 
-            //<NewProductPanel onEditClick={this.editProduct} disabled={false} />
-        }
+          {editProductModal && (
+            <EditProductDialog
+              open={editProductModal}
+              product={product}
+            />
+          )}
+
           
+
+          {account && account.rolename === 'admin' &&  
+            <NewProductPanel onNewClick={this.handleAdd} disabled={false} /> 
+        }
+
+          {/* {account && account.rolename === 'admin' && isEditing &&
+            <NewProductPanel onUpdateClick={this.handleEdit} disabled={false} />
+          } */}
+          
+         
          
           <Paper className={classes.paper}>
               <Subheader>Products</Subheader>
@@ -169,7 +207,7 @@ export default class Home extends Component {
                       account={account}
                       onCompleteClick={this.toggleDone}
                       onDeleteClick={this.deleteProduct}
-                      onEditClick={this.editProduct}
+                      onEditClick={this.displayProduct}
                     />
                   ))}
               </List>

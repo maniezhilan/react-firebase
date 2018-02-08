@@ -18,12 +18,7 @@ export default class NewProductPanel extends Component {
 
   static propTypes = {
     onNewClick: PropTypes.func,
-    onEditClick: PropTypes.func,
-    disabled: PropTypes.bool
-  }
-
-  handleEdit =(product) => {
-    console.log('product', '-------',product);
+    disabled: PropTypes.bool,
   }
 
 
@@ -63,13 +58,15 @@ export default class NewProductPanel extends Component {
             ref="newProductPrice"
             onChange={({ target }) => this.setState({ price: target.value || ''})}
           />
+          
           <IconButton
-                  onClick={() => this.handleAdd()}
+            onClick={() => this.handleAdd()}
                   disabled={disabled}
                   tooltipPosition="top-center"
                   tooltip={disabled ? 'Login To Add Product' : 'Add Product'}>
                   <ContentAdd />
           </IconButton>
+          
         </div>
       </Paper>
     )
