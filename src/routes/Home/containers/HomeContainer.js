@@ -111,26 +111,14 @@ export default class Home extends Component {
     return this.props.firebase.push('/products', newProduct)
   }
 
-  handleEdit = editProduct => {
-    const { products, auth, firebase } = this.props
-    if (!auth || !auth.uid || !auth.rolename === 'admin') {
-      return this.setState({ error: 'You must be Logged into Add' })
-    }
-    // Attach user if logged in
-    if (this.props.auth) {
-      editProduct.owner = this.props.auth.uid
-    } else {
-      editProduct.owner = 'Anonymous'
-    }
-
-    if (editProduct.price === undefined) {
-      editProduct.price = '';
-    }
-
-    // attach a timestamp
-    editProduct.createdAt = this.props.firebase.database.ServerValue.TIMESTAMP
-    // using this.props.firebase.pushWithMeta here instead would automatically attach createdBy and createdAt
-    //return this.props.firebase.push('/products', editProduct)
+  handleEdit = product => {
+    const { firebase: { updateWithMeta } } = this.props
+    // push new project with createdBy and createdAt
+    // return this.props.firebase.updateWithMeta(`/products/${product.id}`,product).catch(err => {
+    //   console.error('Error updating product: ', err) // eslint-disable-line no-console
+    //   this.setState({ error: 'Error updating product' })
+    //   return Promise.reject(err)
+    // })
   }
 
   displayProduct = (product, id) => {
@@ -180,12 +168,16 @@ export default class Home extends Component {
             <EditProductDialog
               open={editProductModal}
               product={product}
+              onSubmit={this.handleEdit}
+              self={this}
             />
+
+            //<EditProductDialog onEditClick={this.handleEdit} disabled={false} /> 
           )}
 
           
 
-          {account && account.rolename === 'admin' &&  
+          {account && account.rolename === 'admin' && !editProductModal &&
             <NewProductPanel onNewClick={this.handleAdd} disabled={false} /> 
         }
 

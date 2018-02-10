@@ -13,7 +13,7 @@ export default class NewProductPanel extends Component {
 
   constructor() {
     super()
-    this.state = {id:null,disabled: false}
+    this.state = { id: null, disabled: false, editProductModal: false}
   }
 
   static propTypes = {
@@ -36,16 +36,17 @@ export default class NewProductPanel extends Component {
 
 
   render() {
-    const { product, disabled} = this.props
-
+    const { product, disabled, editProductModal} = this.state
+    console.log('prod', product, editProductModal)
     return (
-
+      
       <Paper className={classes.container}>
         <Subheader>New Product</Subheader>
         <div className={classes.inputSection}>
           <TextField
             floatingLabelText="New Product Text"
             ref="newProductText"
+            value={editProductModal ? product.text : ''}
             onChange={({ target }) => this.setState({ text: target.value })}
           />
           <TextField
