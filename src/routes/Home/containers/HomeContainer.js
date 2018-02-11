@@ -120,40 +120,27 @@ export default class Home extends Component {
 
   handleEdit = () => {
     const { firebase: { updateWithMeta } } = this.props
-    // // push new project with updatedBy and updatedAt
+    // push new project with updatedBy and updatedAt
     return this.props.firebase.updateWithMeta(`/products/${this.state.product.id}`, this.state.product).catch(err => {
       console.error('Error updating product: ', err) // eslint-disable-line no-console
       this.setState({ error: 'Error updating product' })
       return Promise.reject(err)
     })
-    //this.props.firebase.set(`/products/`+id, this.state.product)
     
   }
 
   updateProduct(event) {
-    console.log('-----update----', event.target.name, event.target.value)
-    // const field = event.target.name;
-    // let product = Object.assign({}, this.state.product);
-    // product[field] = event.target.value;
-    // return this.setState({ product: product });
     const field = event.target.name;
     let product = Object.assign({}, this.state.product);
     product[field] = event.target.value;
     return this.setState({ product: product });
   }
 
-
-  //DisplayProduct - should args product
-  //UpdateProduct - should use event
-
   displayProduct = (product,id) => {
     const { firebase, auth } = this.props
     if (!auth || !auth.uid) {
       return this.setState({ error: 'You must be Logged into Toggle Done' })
     }
-
-    console.log('entering display product -----------');
-    console.log('display Product to update --', this.state.product);
     this.setState({ editProductModal: !this.state.editProductModal })
     product.id = id
     product.key = id
@@ -200,20 +187,11 @@ export default class Home extends Component {
               onChange={this.updateProduct}
             />
 
-            //<EditProductDialog onEditClick={this.handleEdit} disabled={false} /> 
           )}
-
-          
 
           {account && account.rolename === 'admin' && !editProductModal &&
             <NewProductPanel onNewClick={this.handleAdd} disabled={false} /> 
         }
-
-          {/* {account && account.rolename === 'admin' && isEditing &&
-            <NewProductPanel onUpdateClick={this.handleEdit} disabled={false} />
-          } */}
-          
-         
          
           <Paper className={classes.paper}>
               <Subheader>Products</Subheader>

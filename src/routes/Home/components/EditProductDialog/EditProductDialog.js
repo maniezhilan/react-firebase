@@ -32,7 +32,6 @@ export const EditProductDialog = ({
       <FlatButton label="Update" primary onTouchTap={submit} />
     ]}>
       <form onSubmit={handleEdit} className={classes.inputs}>
-        <span>--{product.id}</span>
         <TextField
         name="text"
         value={product.text}
@@ -45,11 +44,13 @@ export const EditProductDialog = ({
           value={product.description}
           multiLine={true}
           rows={5}
+          onChange={onChange}
         />
         <TextField
           floatingLabelText="Price"
           name="price"
           value={product.price}
+          onChange={onChange}
         />
     </form>
   </Dialog>
