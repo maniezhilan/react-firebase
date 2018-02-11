@@ -62,11 +62,18 @@ export default class Home extends Component {
     ])
   }
 
-  state = {
-    error: null,
-    editProductModal: false,
-    product: null
-  }
+  constructor(props,context){
+    super(props,context)
+    this.state = {
+      error: null,
+      editProductModal: false,
+      product: Object.assign({}, this.props.product),
+    }
+    this.updateProduct = this.updateProduct.bind(this);
+    this.handleEdit = this.handleEdit.bind(this);
+}
+
+  
 
   toggleDone = (product, id) => {
     const { firebase, auth } = this.props
@@ -111,28 +118,49 @@ export default class Home extends Component {
     return this.props.firebase.push('/products', newProduct)
   }
 
-  handleEdit = product => {
+  handleEdit = () => {
     const { firebase: { updateWithMeta } } = this.props
-    // push new project with createdBy and createdAt
-    // return this.props.firebase.updateWithMeta(`/products/${product.id}`,product).catch(err => {
-    //   console.error('Error updating product: ', err) // eslint-disable-line no-console
-    //   this.setState({ error: 'Error updating product' })
-    //   return Promise.reject(err)
-    // })
+    // // push new project with updatedBy and updatedAt
+    return this.props.firebase.updateWithMeta(`/products/${this.state.product.id}`, this.state.product).catch(err => {
+      console.error('Error updating product: ', err) // eslint-disable-line no-console
+      this.setState({ error: 'Error updating product' })
+      return Promise.reject(err)
+    })
+    //this.props.firebase.set(`/products/`+id, this.state.product)
+    
   }
 
-  displayProduct = (product, id) => {
+  updateProduct(event) {
+    console.log('-----update----', event.target.name, event.target.value)
+    // const field = event.target.name;
+    // let product = Object.assign({}, this.state.product);
+    // product[field] = event.target.value;
+    // return this.setState({ product: product });
+    const field = event.target.name;
+    let product = Object.assign({}, this.state.product);
+    product[field] = event.target.value;
+    return this.setState({ product: product });
+  }
+
+
+  //DisplayProduct - should args product
+  //UpdateProduct - should use event
+
+  displayProduct = (product,id) => {
     const { firebase, auth } = this.props
     if (!auth || !auth.uid) {
       return this.setState({ error: 'You must be Logged into Toggle Done' })
     }
- 
-    this.setState({ editProductModal: !this.state.editProductModal})
-    this.setState((prevState) => {
-      return { product: product }
-    });
-    console.log('-----', this.state)
+
+    console.log('entering display product -----------');
+    console.log('display Product to update --', this.state.product);
+    this.setState({ editProductModal: !this.state.editProductModal })
+    product.id = id
+    product.key = id
+    this.setState({ product: product })
   }
+
+  
 
   render() {
     const { products } = this.props
@@ -167,9 +195,9 @@ export default class Home extends Component {
           {editProductModal && (
             <EditProductDialog
               open={editProductModal}
-              product={product}
+              product={this.state.product}
               onSubmit={this.handleEdit}
-              self={this}
+              onChange={this.updateProduct}
             />
 
             //<EditProductDialog onEditClick={this.handleEdit} disabled={false} /> 

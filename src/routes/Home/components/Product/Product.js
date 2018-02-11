@@ -13,16 +13,31 @@ import { isObject } from 'lodash'
 
 
 export default class Product extends Component {
+
+  constructor(props, context) {
+    super(props, context);
+    this.state = {
+      product: Object.assign({}, this.props.product)
+      }
+     
+    }
+
   static propTypes = {
     product: PropTypes.object.isRequired,
     id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     onEditClick: PropTypes.func,
     onDeleteClick: PropTypes.func,
     onCompleteClick: PropTypes.func,
-    account: PropTypes.object
+    account: PropTypes.object,
   }
+
+ 
+
+
+  
+
   render() {
-    const { product, id, onCompleteClick, onDeleteClick, onEditClick, account } = this.props
+    const { product, id, onCompleteClick, onDeleteClick, onEditClick, account, editProductModal } = this.props
     return (
       <div className={classes.container}>
       
@@ -41,7 +56,9 @@ export default class Product extends Component {
           rightIconButton={
             account && account.rolename === 'admin' &&
             
-            <FlatButton label="Edit" secondary={true} onClick={() => onEditClick(product,product._key || id)} />
+            <FlatButton label="Edit" secondary={true} onClick={() => onEditClick(product,product._key || id)}>
+              
+            </FlatButton>
             
           }
          
