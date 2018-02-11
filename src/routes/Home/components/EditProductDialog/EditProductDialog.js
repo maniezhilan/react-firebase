@@ -18,6 +18,7 @@ export const EditProductDialog = ({
   handleEdit,
   product,
   onChange,
+  onRequestClose,
   
 }) => (
   
@@ -25,10 +26,10 @@ export const EditProductDialog = ({
     title="Edit Product"
     open={open}
     product={product}
-    //onRequestClose={onRequestClose}
+    onRequestClose={onRequestClose}
     contentClassName={classes.container}
     actions={[
-      //<FlatButton label="Cancel" secondary onTouchTap={onRequestClose} />,
+      <FlatButton label="Cancel" secondary onTouchTap={onRequestClose} />,
       <FlatButton label="Update" primary onTouchTap={submit} />
     ]}>
       <form onSubmit={handleEdit} className={classes.inputs}>

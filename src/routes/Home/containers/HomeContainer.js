@@ -69,11 +69,14 @@ export default class Home extends Component {
       editProductModal: false,
       product: Object.assign({}, this.props.product),
     }
-    this.updateProduct = this.updateProduct.bind(this);
-    this.handleEdit = this.handleEdit.bind(this);
+    this.updateProduct = this.updateProduct.bind(this)
+    this.handleEdit = this.handleEdit.bind(this)
+    this.onRequestClose = this.onRequestClose.bind(this)
 }
 
-  
+  onRequestClose = () => {
+    this.setState({ editProductModal:!this.state.editProductModal})
+  }
 
   toggleDone = (product, id) => {
     const { firebase, auth } = this.props
@@ -119,6 +122,7 @@ export default class Home extends Component {
   }
 
   handleEdit = () => {
+    this.setState({ editProductModal: !this.state.editProductModal })
     const { firebase: { updateWithMeta } } = this.props
     // push new project with updatedBy and updatedAt
     return this.props.firebase.updateWithMeta(`/products/${this.state.product.id}`, this.state.product).catch(err => {
@@ -185,6 +189,7 @@ export default class Home extends Component {
               product={this.state.product}
               onSubmit={this.handleEdit}
               onChange={this.updateProduct}
+              onRequestClose={this.onRequestClose}
             />
 
           )}
