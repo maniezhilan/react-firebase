@@ -27,7 +27,7 @@ export default class Product extends Component {
     id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     onEditClick: PropTypes.func,
     onDeleteClick: PropTypes.func,
-    onCompleteClick: PropTypes.func,
+    onSelectClick: PropTypes.func,
     account: PropTypes.object,
   }
 
@@ -37,7 +37,7 @@ export default class Product extends Component {
   
 
   render() {
-    const { product, id, onCompleteClick, onDeleteClick, onEditClick, account, editProductModal } = this.props
+    const { product, id, onSelectClick, onDeleteClick, onEditClick, account, editProductModal } = this.props
     return (
       <div className={classes.container}>
       
@@ -45,7 +45,7 @@ export default class Product extends Component {
           leftIcon={ account && account.rolename === 'admin' &&  
             <Checkbox
               defaultChecked={product.done}
-              onCheck={() => onCompleteClick(product, product._key || id)}
+            onCheck={() => onSelectClick(product, product._key || id)}
             />
           }
           

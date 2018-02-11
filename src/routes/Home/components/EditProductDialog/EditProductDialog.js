@@ -14,12 +14,11 @@ import classes from './EditProductDialog.scss'
 
 export const EditProductDialog = ({
   open,
-  submit,
   handleEdit,
   product,
   onChange,
   onRequestClose,
-  
+  submit
 }) => (
   
   <Dialog
@@ -59,7 +58,6 @@ export const EditProductDialog = ({
 
 EditProductDialog.propTypes = {
   open: PropTypes.bool,
-  //onRequestClose: PropTypes.func,
   onSubmit: PropTypes.func, // eslint-disable-line react/no-unused-prop-types
   handleSubmit: PropTypes.func, // added by redux-form
   submit: PropTypes.func, // added by redux-form

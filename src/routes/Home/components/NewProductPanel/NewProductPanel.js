@@ -37,7 +37,6 @@ export default class NewProductPanel extends Component {
 
   render() {
     const { product, disabled, editProductModal} = this.state
-    console.log('prod', product, editProductModal)
     return (
       
       <Paper className={classes.container}>

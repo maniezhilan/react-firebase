@@ -16,10 +16,13 @@ import Snackbar from 'material-ui/Snackbar'
 import { List } from 'material-ui/List'
 import Paper from 'material-ui/Paper'
 import Subheader from 'material-ui/Subheader'
+import DatePicker from 'material-ui/DatePicker';
 import Product from '../components/Product'
 import NewProductPanel from '../components/NewProductPanel'
 import EditProductDialog from '../components/EditProductDialog'
+import MenuDialog from '../components/MenuDialog'
 import classes from './HomeContainer.scss'
+import RaisedButton from 'material-ui/RaisedButton';
 
 
 // const populates = [{ child: 'owner', root: 'users', keyProp: 'uid' }]
@@ -66,24 +69,47 @@ export default class Home extends Component {
     super(props,context)
     this.state = {
       error: null,
+      showMenuModal:false,
       editProductModal: false,
       product: Object.assign({}, this.props.product),
+      menu: Object.assign({}, this.props.menu),
+      startDate: null,
+      endDate:null,
+      selectedProducts: Object.assign([], this.props.selectedProducts)
     }
     this.updateProduct = this.updateProduct.bind(this)
     this.handleEdit = this.handleEdit.bind(this)
     this.onRequestClose = this.onRequestClose.bind(this)
 }
 
+  handleStartDateChange = (event, startDate) => {
+    this.setState({
+      startDate: startDate
+    });
+  };
+
+  handleEndDateChange = (event, endDate) => {
+    this.setState({
+      endDate: endDate
+    });
+  };
+
   onRequestClose = () => {
     this.setState({ editProductModal:!this.state.editProductModal})
   }
 
-  toggleDone = (product, id) => {
+  selectProduct = (product, id) => {
     const { firebase, auth } = this.props
     if (!auth || !auth.uid) {
-      return this.setState({ error: 'You must be Logged into Toggle Done' })
+      return this.setState({ error: 'You must be Logged into Create Done' })
     }
-    //return firebase.set(`/products/${id}/done`, !product.done)
+    // if (Object.getOwnPropertyNames(this.state.selectedProducts).length === 0){
+    //   let item = Object.assign({}, this.state.selectedProducts)
+    //   this.setState({ selectedProducts: [...item, product] })
+    //   console.log(this.state.selectedProducts);
+    this.setState({ selectedProducts: [...this.state.selectedProducts, product] })
+    console.log(this.state.selectedProducts);
+    
   }
 
   deleteProduct = id => {
@@ -151,6 +177,15 @@ export default class Home extends Component {
     this.setState({ product: product })
   }
 
+  createMenu = () =>{
+    this.setState({showMenuModal: !this.state.showMenuModal})
+    //construct the menu
+    let menu = this.state.menu
+    menu.startDate = this.state.startDate
+    menu.endDate = this.state.endDate
+    menu.selectedProducts = this.state.selectedProducts
+    console.log(menu);
+  }
   
 
   render() {
@@ -158,8 +193,9 @@ export default class Home extends Component {
     const { error } = this.state
     const { account} = this.props
     const { editProductModal } = this.state
+    const { showMenuModal } = this.state
     const { product } = this.state
-    
+    const { selectedProducts } = this.state
     return (
       <div
         className={classes.container}
@@ -194,12 +230,33 @@ export default class Home extends Component {
 
           )}
 
+          {showMenuModal && (
+            <MenuDialog
+              open={showMenuModal}
+              product={this.state.product}
+              onSubmit={this.handleEdit}
+              onChange={this.updateProduct}
+              onRequestClose={this.onRequestClose}
+            />
+
+          )}
+
           {account && account.rolename === 'admin' && !editProductModal &&
             <NewProductPanel onNewClick={this.handleAdd} disabled={false} /> 
         }
          
           <Paper className={classes.paper}>
               <Subheader>Products</Subheader>
+              <DatePicker
+                hintText="Start Date"
+                value={this.state.startDate}
+              onChange={this.handleStartDateChange}
+              />
+            <DatePicker
+              hintText="End Date"
+              value={this.state.endDate}
+              onChange={this.handleEndDateChange}
+            />
               <List className={classes.list}>
                 {products &&
                   map(products, (product, id) => (
@@ -208,12 +265,15 @@ export default class Home extends Component {
                       id={id}
                       product={product}
                       account={account}
-                      onCompleteClick={this.toggleDone}
+                      onSelectClick={this.selectProduct}
                       onDeleteClick={this.deleteProduct}
                       onEditClick={this.displayProduct}
                     />
                   ))}
               </List>
+            <RaisedButton label="Create Menu" primary={true}
+              onClick={this.createMenu}      
+            />
             </Paper>
         
         </div>
