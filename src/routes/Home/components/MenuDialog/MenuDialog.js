@@ -6,34 +6,44 @@ import { Field, reduxForm } from 'redux-form'
 import { TextField } from 'redux-form-material-ui'
 import { required } from 'utils/form'
 import { CREATE_MENU_FORM_NAME } from 'constants'
-
+import { map } from 'lodash'
 import classes from './MenuDialog.scss'
+import Subheader from 'material-ui/Subheader'
+import { List } from 'material-ui/List'
 
 export const MenuDialog = ({
   open,
     handleEdit,
-    product,
+    products,
     onChange,
-    onRequestClose,
-    submit
+    onRequestCloseMenu,
+    submit,
+    menu
 }) => (
 
         <Dialog
             title="Menu"
             open={open}
-            product={product}
-            onRequestClose={onRequestClose}
+            products={products}
+            onRequestCloseMenu={onRequestCloseMenu}
             contentClassName={classes.container}
             actions={[
-                <FlatButton label="Cancel" secondary onTouchTap={onRequestClose} />,
-                <FlatButton label="Update" primary onTouchTap={submit} />
+                <FlatButton label="Cancel" secondary onTouchTap={onRequestCloseMenu} />,
+                <FlatButton label="Submit" primary onTouchTap={submit} />
             ]}>
-            <form onSubmit={handleEdit} className={classes.inputs}>
-                <span>Menu for the week</span>
-                <span>Date</span>
-                <span>
-                    {product.text}
-                </span>
+            <form >
+               
+                <Subheader> Week:  {menu.startDate.toString()}  - {menu.endDate.toString()} </Subheader>
+                <List className={classes.list}>
+                {products &&
+                    map(products, (product, id) => (
+                    <span key={product.key}>
+                        {product.text}
+                    </span>
+                    )
+                )
+                }
+                </List>
                 <span>Quantity</span>
                 <span></span>
             </form>
@@ -45,7 +55,7 @@ MenuDialog.propTypes = {
     onSubmit: PropTypes.func, // eslint-disable-line react/no-unused-prop-types
     handleSubmit: PropTypes.func, // added by redux-form
     submit: PropTypes.func, // added by redux-form
-    product: PropTypes.object.isRequired
+    products: PropTypes.array
 }
 
 

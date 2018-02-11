@@ -80,6 +80,7 @@ export default class Home extends Component {
     this.updateProduct = this.updateProduct.bind(this)
     this.handleEdit = this.handleEdit.bind(this)
     this.onRequestClose = this.onRequestClose.bind(this)
+    this.onRequestCloseMenu = this.onRequestCloseMenu.bind(this)
 }
 
   handleStartDateChange = (event, startDate) => {
@@ -98,18 +99,17 @@ export default class Home extends Component {
     this.setState({ editProductModal:!this.state.editProductModal})
   }
 
+  onRequestCloseMenu = () => {
+    this.setState({ showMenuModal: !this.state.showMenuModal })
+  }
+
   selectProduct = (product, id) => {
     const { firebase, auth } = this.props
     if (!auth || !auth.uid) {
       return this.setState({ error: 'You must be Logged into Create Done' })
     }
-    // if (Object.getOwnPropertyNames(this.state.selectedProducts).length === 0){
-    //   let item = Object.assign({}, this.state.selectedProducts)
-    //   this.setState({ selectedProducts: [...item, product] })
-    //   console.log(this.state.selectedProducts);
+    product.key = id
     this.setState({ selectedProducts: [...this.state.selectedProducts, product] })
-    console.log(this.state.selectedProducts);
-    
   }
 
   deleteProduct = id => {
@@ -184,7 +184,6 @@ export default class Home extends Component {
     menu.startDate = this.state.startDate
     menu.endDate = this.state.endDate
     menu.selectedProducts = this.state.selectedProducts
-    console.log(menu);
   }
   
 
@@ -233,10 +232,11 @@ export default class Home extends Component {
           {showMenuModal && (
             <MenuDialog
               open={showMenuModal}
-              product={this.state.product}
+              products={this.state.selectedProducts}
               onSubmit={this.handleEdit}
               onChange={this.updateProduct}
-              onRequestClose={this.onRequestClose}
+              onRequestCloseMenu={this.onRequestCloseMenu}
+              menu={this.state.menu}
             />
 
           )}
