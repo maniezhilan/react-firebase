@@ -16,14 +16,11 @@ import MenuItem from 'material-ui/MenuItem';
 
 export const MenuDialog = ({
     open,
-    handleEdit,
-    onChange,
+    saveMenu,
     onRequestCloseMenu,
     submit,
     menu,
     formatDate,
-    handleUpdateInput,
-    handleNewRequest,
     dataSource,
     searchText
 }) => (
@@ -36,7 +33,7 @@ export const MenuDialog = ({
                 <FlatButton label="Cancel" secondary onTouchTap={onRequestCloseMenu} />,
                 <FlatButton label="Submit" primary onTouchTap={submit} />
             ]}>
-            <form >
+            <form onSubmit={saveMenu} className={classes.inputs}>
                 <Subheader> Week starting from :  {formatDate(menu.startDate)} till   {formatDate(menu.endDate)} </Subheader>
                 <List className={classes.list}>
                 {menu.dates && 
@@ -48,9 +45,6 @@ export const MenuDialog = ({
                                     key={date}
                                     id={date}
                                     hintText="Type Product name"
-                                    //searchText={searchText}
-                                    //onUpdateInput={handleUpdateInput}
-                                    //onNewRequest={handleNewRequest}
                                     dataSource={dataSource}
                                     filter={(searchText, key) => (key.indexOf(searchText) !== -1)}
                                     openOnFocus={true}

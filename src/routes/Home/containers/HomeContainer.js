@@ -30,7 +30,8 @@ import RaisedButton from 'material-ui/RaisedButton';
 @firebaseConnect([
   // 'todos' // sync full list of todos
   // { path: 'todos', type: 'once' } // for loading once instead of binding
-  { path: 'products', queryParams: ['orderByKey', 'limitToLast=5'] } // 10 most recent
+  { path: 'products', queryParams: ['orderByKey', 'limitToLast=5'] }, // 10 most recent
+  { path: 'menu', queryParams: ['orderByKey', 'limitToLast=5'] } // 10 most recent
   // { path: 'todos', populates } // populate
   // { path: 'todos', storeAs: 'myTodos' } // store elsewhere in redux
 ])
@@ -38,6 +39,8 @@ import RaisedButton from 'material-ui/RaisedButton';
   auth: pathToJS(firebase, 'auth'),
   account: pathToJS(firebase, 'profile'),
   products: dataToJS(firebase, 'products'),
+  menus: dataToJS(firebase, 'menus'),
+  
   // todos: orderedToJS(firebase, 'todos') // if looking for array
   // todos: dataToJS(firebase, 'myTodos'), // if using storeAs
   // todos: populatedDataToJS(firebase, 'todos', populates), // if populating
@@ -82,25 +85,12 @@ export default class Home extends Component {
     }
     this.updateProduct = this.updateProduct.bind(this)
     this.handleEdit = this.handleEdit.bind(this)
+    this.saveMenu = this.saveMenu.bind(this)
+    this.createMenu = this.createMenu.bind(this)
     this.onRequestClose = this.onRequestClose.bind(this)
     this.onRequestCloseMenu = this.onRequestCloseMenu.bind(this)
 }
-
-  
-
-
-  handleUpdateInput = (searchText) => {
-    this.setState({
-      searchText: searchText,
-    });
-  };
-
-  handleNewRequest = () => {
-    this.setState({
-      searchText: '',
-    });
-  };
-  
+ 
 
   handleStartDateChange = (event, startDate) => {
     this.setState({
@@ -206,7 +196,16 @@ export default class Home extends Component {
     menu.selectedProducts = this.state.selectedProducts
     menu.selectedProductTitles = this.state.selectedProductTitles
     menu.dates = this.getDateRange(menu.startDate, menu.endDate)
-    console.log('Menu ',menu);
+  }
+
+  saveMenu = () => {
+    console.log('saveMenu called');
+    this.setState({ showMenuModal: !this.state.showMenuModal })
+    const { menus, auth, firebase } = this.props
+    if (!auth || !auth.uid || !auth.rolename === 'admin') {
+      return this.setState({ error: 'You must be Logged into Add' })
+    }
+    this.props.firebase.pushWithMeta('/menus',this.state.menu)
   }
 
   //https://stackoverflow.com/questions/3552461/how-to-format-a-javascript-date
@@ -286,16 +285,13 @@ export default class Home extends Component {
           {showMenuModal && (
             <MenuDialog
               open={showMenuModal}
-              onSubmit={this.handleEdit}
+              onSubmit={this.saveMenu}
               onChange={this.updateProduct}
               onRequestCloseMenu={this.onRequestCloseMenu}
               menu={this.state.menu}
               formatDate={this.formatDate}
-              handleUpdateInput={this.handleUpdateInput}
-              handleNewRequest={this.handleNewRequest}
               dataSource={this.state.selectedProductTitles}
               searchText={this.state.searchText}
-              handleChange={this.handleChange}
             />
 
           )}
