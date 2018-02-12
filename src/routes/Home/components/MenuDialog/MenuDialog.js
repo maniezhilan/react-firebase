@@ -46,10 +46,11 @@ export const MenuDialog = ({
                             {/* http://www.material-ui.com/v0.19.4/#/components/auto-complete //TODO: Needs to be a new child component*/}
                                 <AutoComplete
                                     key={date}
+                                    id={date}
                                     hintText="Type Product name"
-                                    searchText={searchText}
-                                    onUpdateInput={handleUpdateInput}
-                                    onNewRequest={handleNewRequest}
+                                    //searchText={searchText}
+                                    //onUpdateInput={handleUpdateInput}
+                                    //onNewRequest={handleNewRequest}
                                     dataSource={dataSource}
                                     filter={(searchText, key) => (key.indexOf(searchText) !== -1)}
                                     openOnFocus={true}
