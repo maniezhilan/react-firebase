@@ -184,6 +184,37 @@ export default class Home extends Component {
     menu.startDate = this.state.startDate
     menu.endDate = this.state.endDate
     menu.selectedProducts = this.state.selectedProducts
+    menu.dates = this.getDateRange(menu.startDate, menu.endDate)
+    console.log('Menu ',menu);
+  }
+
+  //https://stackoverflow.com/questions/3552461/how-to-format-a-javascript-date
+  formatDate = (date) => {
+    let options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    return date.toLocaleDateString("en-US",options)
+  }
+
+  
+  //https://stackoverflow.com/questions/4413590/javascript-get-array-of-dates-between-2-dates/15882220
+  getDateRange = (startDate, endDate) => {
+
+    Date.prototype.addDays = function (days) {
+      var date = new Date(this.valueOf());
+      date.setDate(date.getDate() + days);
+      return date;
+    }  
+
+      let addFn = Date.prototype.addDays;
+      let interval = 1;
+
+      var retVal = [];
+      var current = new Date(startDate);
+
+      while (current <= endDate) {
+        retVal.push(this.formatDate(new Date(current)))
+        current = addFn.call(current, interval);
+      }
+    return retVal;
   }
   
 
@@ -232,11 +263,11 @@ export default class Home extends Component {
           {showMenuModal && (
             <MenuDialog
               open={showMenuModal}
-              products={this.state.selectedProducts}
               onSubmit={this.handleEdit}
               onChange={this.updateProduct}
               onRequestCloseMenu={this.onRequestCloseMenu}
               menu={this.state.menu}
+              formatDate={this.formatDate}
             />
 
           )}
@@ -251,11 +282,13 @@ export default class Home extends Component {
                 hintText="Start Date"
                 value={this.state.startDate}
               onChange={this.handleStartDateChange}
+              formatDate={this.formatDate}
               />
             <DatePicker
               hintText="End Date"
               value={this.state.endDate}
               onChange={this.handleEndDateChange}
+              formatDate={this.formatDate}
             />
               <List className={classes.list}>
                 {products &&

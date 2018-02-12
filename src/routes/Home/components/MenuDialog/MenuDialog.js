@@ -12,19 +12,17 @@ import Subheader from 'material-ui/Subheader'
 import { List } from 'material-ui/List'
 
 export const MenuDialog = ({
-  open,
+    open,
     handleEdit,
-    products,
     onChange,
     onRequestCloseMenu,
     submit,
-    menu
+    menu,
+    formatDate
 }) => (
-
         <Dialog
             title="Menu"
             open={open}
-            products={products}
             onRequestCloseMenu={onRequestCloseMenu}
             contentClassName={classes.container}
             actions={[
@@ -32,20 +30,16 @@ export const MenuDialog = ({
                 <FlatButton label="Submit" primary onTouchTap={submit} />
             ]}>
             <form >
-               
-                <Subheader> Week:  {menu.startDate.toString()}  - {menu.endDate.toString()} </Subheader>
+                <Subheader> Week starting from :  {formatDate(menu.startDate)} till   {formatDate(menu.endDate)} </Subheader>
                 <List className={classes.list}>
-                {products &&
-                    map(products, (product, id) => (
-                    <span key={product.key}>
-                        {product.text}
-                    </span>
-                    )
-                )
-                }
+                {menu.dates && 
+                    map(menu.dates, (date) => (
+                    <div>
+                        {date}
+                    </div>    
+                    
+                ))}
                 </List>
-                <span>Quantity</span>
-                <span></span>
             </form>
         </Dialog>
     )
@@ -55,7 +49,6 @@ MenuDialog.propTypes = {
     onSubmit: PropTypes.func, // eslint-disable-line react/no-unused-prop-types
     handleSubmit: PropTypes.func, // added by redux-form
     submit: PropTypes.func, // added by redux-form
-    products: PropTypes.array
 }
 
 

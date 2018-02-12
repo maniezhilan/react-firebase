@@ -36,7 +36,7 @@ export default class NewProductPanel extends Component {
 
 
   render() {
-    const { product, disabled, editProductModal} = this.state
+    const { product, disabled} = this.state
     return (
       
       <Paper className={classes.container}>
@@ -45,7 +45,6 @@ export default class NewProductPanel extends Component {
           <TextField
             floatingLabelText="New Product Text"
             ref="newProductText"
-            value={editProductModal ? product.text : ''}
             onChange={({ target }) => this.setState({ text: target.value })}
           />
           <TextField
