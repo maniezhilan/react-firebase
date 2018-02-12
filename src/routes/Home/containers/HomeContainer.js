@@ -75,13 +75,32 @@ export default class Home extends Component {
       menu: Object.assign({}, this.props.menu),
       startDate: null,
       endDate:null,
-      selectedProducts: Object.assign([], this.props.selectedProducts)
+      selectedProducts: Object.assign([], this.props.selectedProducts),
+      searchText: '',
+      selectedProductTitles: Object.assign([], this.props.selectedProductTitles),
+      values: [],
     }
     this.updateProduct = this.updateProduct.bind(this)
     this.handleEdit = this.handleEdit.bind(this)
     this.onRequestClose = this.onRequestClose.bind(this)
     this.onRequestCloseMenu = this.onRequestCloseMenu.bind(this)
 }
+
+  
+
+
+  handleUpdateInput = (searchText) => {
+    this.setState({
+      searchText: searchText,
+    });
+  };
+
+  handleNewRequest = () => {
+    this.setState({
+      searchText: '',
+    });
+  };
+  
 
   handleStartDateChange = (event, startDate) => {
     this.setState({
@@ -110,6 +129,7 @@ export default class Home extends Component {
     }
     product.key = id
     this.setState({ selectedProducts: [...this.state.selectedProducts, product] })
+    this.setState({ selectedProductTitles: [...this.state.selectedProductTitles, product.text] })
   }
 
   deleteProduct = id => {
@@ -184,6 +204,7 @@ export default class Home extends Component {
     menu.startDate = this.state.startDate
     menu.endDate = this.state.endDate
     menu.selectedProducts = this.state.selectedProducts
+    menu.selectedProductTitles = this.state.selectedProductTitles
     menu.dates = this.getDateRange(menu.startDate, menu.endDate)
     console.log('Menu ',menu);
   }
@@ -226,6 +247,8 @@ export default class Home extends Component {
     const { showMenuModal } = this.state
     const { product } = this.state
     const { selectedProducts } = this.state
+    const { selectedProductTitles } = this.state
+
     return (
       <div
         className={classes.container}
@@ -268,6 +291,11 @@ export default class Home extends Component {
               onRequestCloseMenu={this.onRequestCloseMenu}
               menu={this.state.menu}
               formatDate={this.formatDate}
+              handleUpdateInput={this.handleUpdateInput}
+              handleNewRequest={this.handleNewRequest}
+              dataSource={this.state.selectedProductTitles}
+              searchText={this.state.searchText}
+              handleChange={this.handleChange}
             />
 
           )}
