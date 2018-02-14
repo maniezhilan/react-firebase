@@ -22,7 +22,9 @@ export const MenuDialog = ({
     menu,
     formatDate,
     dataSource,
-    searchText
+    searchText,
+    onAddBtnClick,
+    inputList
 }) => (
         <Dialog
             title="Menu"
@@ -49,6 +51,14 @@ export const MenuDialog = ({
                                     filter={(searchText, key) => (key.indexOf(searchText) !== -1)}
                                     openOnFocus={true}
                                 />
+                            {/* http://jsfiddle.net/69z2wepo/36715/ */}
+                            {/* <div>
+                                <button onClick={onAddBtnClick}>Add input</button>
+                                {inputList.map(function (input, index) {
+                                    return input;
+                                })}
+                            </div> */}
+
                     </div>    
                     
                 ))}

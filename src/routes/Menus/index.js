@@ -1,4 +1,4 @@
-import { LIST_PATH as path } from 'constants'
+import { MENU_PATH as path } from 'constants'
 
 export default store => ({
   path,
@@ -11,24 +11,24 @@ export default store => ({
       require => {
         /*  Webpack - use require callback to define
           dependencies for bundling   */
-        const Projects = require('./containers/ProjectsContainer').default
+        const Menus = require('./containers/MenusContainer').default
 
         /*  Return getComponent   */
-        cb(null, Projects)
+        cb(null, Menus)
 
         /* Webpack named bundle   */
       },
-      'Projects'
+      'Menus'
     )
   },
   getChildRoutes(partialNextState, cb) {
     require.ensure([], require => {
       /*  Webpack - use require callback to define
           dependencies for bundling   */
-      const Project = require('./routes/Project').default
-
+      const menu = require('./routes/menu').default
+      //const newMenu = require('./routes/newMenu').default
       /*  Return getComponent   */
-      cb(null, [Project(store)])
+      cb(null, [menu(store)])
     })
   }
 })

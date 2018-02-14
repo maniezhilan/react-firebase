@@ -1,5 +1,5 @@
 export default store => ({
-  path: ':projectname',
+  path: ':menuid',
   /*  Async getComponent is only invoked when route matches   */
   getComponent(nextState, cb) {
     /*  Webpack - use 'require.ensure' to create a split point
@@ -9,14 +9,14 @@ export default store => ({
       require => {
         /*  Webpack - use require callback to define
           dependencies for bundling   */
-        const Project = require('./containers/ProjectContainer').default
+        const menu = require('./containers/MenuContainer').default
 
         /*  Return getComponent   */
-        cb(null, Project)
+        cb(null, menu)
 
         /* Webpack named bundle   */
       },
-      'Project'
+      'menu'
     )
   }
 })

@@ -31,7 +31,7 @@ import RaisedButton from 'material-ui/RaisedButton';
   // 'todos' // sync full list of todos
   // { path: 'todos', type: 'once' } // for loading once instead of binding
   { path: 'products', queryParams: ['orderByKey', 'limitToLast=5'] }, // 10 most recent
-  { path: 'menu', queryParams: ['orderByKey', 'limitToLast=5'] } // 10 most recent
+  { path: 'menus', queryParams: ['orderByKey', 'limitToLast=5'] } // 10 most recent
   // { path: 'todos', populates } // populate
   // { path: 'todos', storeAs: 'myTodos' } // store elsewhere in redux
 ])
@@ -82,6 +82,7 @@ export default class Home extends Component {
       searchText: '',
       selectedProductTitles: Object.assign([], this.props.selectedProductTitles),
       values: [],
+      inputList: []
     }
     this.updateProduct = this.updateProduct.bind(this)
     this.handleEdit = this.handleEdit.bind(this)
@@ -89,7 +90,16 @@ export default class Home extends Component {
     this.createMenu = this.createMenu.bind(this)
     this.onRequestClose = this.onRequestClose.bind(this)
     this.onRequestCloseMenu = this.onRequestCloseMenu.bind(this)
+    this.onAddBtnClick = this.onAddBtnClick.bind(this);
+
 }
+
+  onAddBtnClick(event) {
+    const inputList = this.state.inputList;
+    this.setState({
+      inputList: inputList.concat(<Input key={inputList.length} />)
+    });
+  }
  
 
   handleStartDateChange = (event, startDate) => {
@@ -279,7 +289,7 @@ export default class Home extends Component {
               onChange={this.updateProduct}
               onRequestClose={this.onRequestClose}
             />
-
+            
           )}
 
           {showMenuModal && (
@@ -292,6 +302,8 @@ export default class Home extends Component {
               formatDate={this.formatDate}
               dataSource={this.state.selectedProductTitles}
               searchText={this.state.searchText}
+              inputList={this.state.inputList}
+              onAddBtnClick={this.onAddBtnClick}
             />
 
           )}

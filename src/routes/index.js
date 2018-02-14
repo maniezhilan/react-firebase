@@ -3,7 +3,7 @@ import CoreLayout from '../layouts/CoreLayout'
 import Home from './Home'
 import LoginRoute from './Login'
 import SignupRoute from './Signup'
-import ProjectsRoute from './Projects'
+import MenusRoute from './Menus'
 import AccountRoute from './Account'
 import RecoverRoute from './Recover'
 import NotFoundRoute from './NotFound'
@@ -19,7 +19,7 @@ export const createRoutes = store => ({
     AccountRoute,
     LoginRoute,
     SignupRoute,
-    ProjectsRoute(store), // async route definitions recieve store
+    MenusRoute(store), // async route definitions recieve store
     RecoverRoute(store), // async route definitions recieve store
     /* Place all Routes above here so NotFoundRoute can act as a 404 page */
     NotFoundRoute(store) // async route definitions recieve store
