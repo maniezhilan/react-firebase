@@ -22,9 +22,14 @@ export const MenuDialog = ({
     menu,
     formatDate,
     dataSource,
+    dataSourceConfig,
     searchText,
-    onAddBtnClick,
-    inputList
+    handleAddDailyMenu,
+    handleRemoveDailyMenu,
+    handleDailyMenuQtyChange,
+    handleDailyMenuNameChange,
+    dailyMenu
+
 }) => (
         <Dialog
             title="Menu"
@@ -38,30 +43,45 @@ export const MenuDialog = ({
             <form onSubmit={saveMenu} className={classes.inputs}>
                 <Subheader> Week starting from :  {formatDate(menu.startDate)} till   {formatDate(menu.endDate)} </Subheader>
                 <List className={classes.list}>
-                {menu.dates && 
+                {/* {menu.dates && 
                     map(menu.dates, (date) => (
                     <div key={date}>
-                        {date}  
-                            {/* http://www.material-ui.com/v0.19.4/#/components/auto-complete //TODO: Needs to be a new child component*/}
-                                <AutoComplete
-                                    key={date}
-                                    id={date}
-                                    hintText="Type Product name"
-                                    dataSource={dataSource}
-                                    filter={(searchText, key) => (key.indexOf(searchText) !== -1)}
-                                    openOnFocus={true}
-                                />
-                            {/* http://jsfiddle.net/69z2wepo/36715/ */}
-                            {/* <div>
-                                <button onClick={onAddBtnClick}>Add input</button>
-                                {inputList.map(function (input, index) {
-                                    return input;
-                                })}
-                            </div> */}
-
-                    </div>    
-                    
-                ))}
+                        {date}    */}
+                            {dailyMenu.map((dailyMenu, idx) => (
+                                <div className="dailyMenu" key={idx}>
+                                    <AutoComplete
+                                        // key={idx}
+                                        // id={idx}
+                                        hintText={`Type product #${idx + 1} name`}
+                                        dataSource={dataSource}
+                                        dataSourceConfig={dataSourceConfig}
+                                        filter={(searchText, key) => (key.indexOf(searchText) !== -1)}
+                                        openOnFocus={true}
+                                        onNewRequest={handleDailyMenuNameChange(idx)}
+                                        value={dailyMenu.name}
+                                    />
+                            {/* <TextField
+                                hintText={`Type product #${idx + 1} name`}
+                                value={dailyMenu.name}
+                                onChange={handleDailyMenuNameChange(idx)}
+                                // key={idx}
+                                // id={idx}
+                            />     */}
+                                    <TextField
+                                        hintText={`Type product #${idx +1} quantity`}
+                                        value={dailyMenu.quantity}
+                                        onChange={handleDailyMenuQtyChange(idx)}
+                                        // key={idx}
+                                        // id={idx}
+                                    />    
+                                  
+                                    <button type="button" onClick={handleRemoveDailyMenu(idx)} className="small">-</button>
+                                   
+                                </div>
+                            ))}
+                            <button type="button" onClick={handleAddDailyMenu} className="small">Add</button>
+                        {/* </div>
+                ))}  */}
                 </List>
             </form>
         </Dialog>

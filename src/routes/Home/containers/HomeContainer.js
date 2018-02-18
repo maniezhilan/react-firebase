@@ -22,7 +22,8 @@ import NewProductPanel from '../components/NewProductPanel'
 import EditProductDialog from '../components/EditProductDialog'
 import MenuDialog from '../components/MenuDialog'
 import classes from './HomeContainer.scss'
-import RaisedButton from 'material-ui/RaisedButton';
+import RaisedButton from 'material-ui/RaisedButton'
+import { pick } from 'lodash'
 
 
 // const populates = [{ child: 'owner', root: 'users', keyProp: 'uid' }]
@@ -80,9 +81,9 @@ export default class Home extends Component {
       endDate:null,
       selectedProducts: Object.assign([], this.props.selectedProducts),
       searchText: '',
-      selectedProductTitles: Object.assign([], this.props.selectedProductTitles),
-      values: [],
-      inputList: []
+      name: '',
+      quantity: '',
+      dailyMenus: [{ name: '', quantity: '' }],
     }
     this.updateProduct = this.updateProduct.bind(this)
     this.handleEdit = this.handleEdit.bind(this)
@@ -90,17 +91,49 @@ export default class Home extends Component {
     this.createMenu = this.createMenu.bind(this)
     this.onRequestClose = this.onRequestClose.bind(this)
     this.onRequestCloseMenu = this.onRequestCloseMenu.bind(this)
-    this.onAddBtnClick = this.onAddBtnClick.bind(this);
-
+    //this.handleDailyMenuNameChange = this.handleDailyMenuNameChange.bind(this)
+    //this.handleDailyMenuQtyChange = this.handleDailyMenuQtyChange.bind(this)
 }
 
-  onAddBtnClick(event) {
-    const inputList = this.state.inputList;
-    this.setState({
-      inputList: inputList.concat(<Input key={inputList.length} />)
-    });
+  handleNameChange = (evt) => {
+    this.setState({ name: evt.target.value });
   }
- 
+
+  handleQtyChange = (evt) => {
+    this.setState({ quantity: evt.target.value });
+  }
+
+  handleDailyMenuNameChange = (idx) => (evt) => {
+    console.log('Namechange evt', evt)
+    
+    const newDailyMenus = this.state.dailyMenus.map((dailyMenu, sidx) => {
+      if (idx !== sidx) return dailyMenu;
+      return { ...dailyMenu, name: evt.text };
+    });
+    this.setState({ dailyMenus: newDailyMenus });
+    console.log('Namechange',this.state.dailyMenus)
+  }
+
+  handleDailyMenuQtyChange = (idx) => (evt) => {
+    const newDailyMenus = this.state.dailyMenus.map((dailyMenu, sidx) => {
+      if (idx !== sidx) return dailyMenu;
+      return { ...dailyMenu, quantity: evt.target.value };
+    });
+
+    this.setState({ dailyMenus: newDailyMenus });
+    console.log('qtychange',this.state.dailyMenus)
+  }
+
+
+
+  handleAddDailyMenu = () => {
+    this.setState({ dailyMenus: this.state.dailyMenus.concat([{ name: '', quantity: '' }]) });
+  }
+
+  handleRemoveDailyMenu = (idx) => () => {
+    this.setState({ dailyMenus: this.state.dailyMenus.filter((s, sidx) => idx !== sidx) });
+    console.log('Remove--',this.state.dailyMenus)
+  }
 
   handleStartDateChange = (event, startDate) => {
     this.setState({
@@ -129,7 +162,6 @@ export default class Home extends Component {
     }
     product.key = id
     this.setState({ selectedProducts: [...this.state.selectedProducts, product] })
-    this.setState({ selectedProductTitles: [...this.state.selectedProductTitles, product.text] })
   }
 
   deleteProduct = id => {
@@ -204,18 +236,29 @@ export default class Home extends Component {
     menu.startDate = this.state.startDate
     menu.endDate = this.state.endDate
     menu.selectedProducts = this.state.selectedProducts
-    menu.selectedProductTitles = this.state.selectedProductTitles
     menu.dates = this.getDateRange(menu.startDate, menu.endDate)
+    let day = menu.startDate 
+    menu.dates[day] = this.state.dailyMenus
+    console.log(menu.selectedProducts);
   }
+
+  dataSourceConfig = {
+    text: 'text',
+    value: 'id',
+  };
 
   saveMenu = () => {
     console.log('saveMenu called');
+    let menu = Object.assign({}, this.props.menu)
+    let day = menu.startDate
+    menu.dates[day] = this.state.dailyMenus
     this.setState({ showMenuModal: !this.state.showMenuModal })
     const { menus, auth, firebase } = this.props
     if (!auth || !auth.uid || !auth.rolename === 'admin') {
       return this.setState({ error: 'You must be Logged into Add' })
     }
-    this.props.firebase.pushWithMeta('/menus',this.state.menu)
+    console.log(" menu items",menu.dates)
+    this.props.firebase.pushWithMeta('/menus',menu)
   }
 
   //https://stackoverflow.com/questions/3552461/how-to-format-a-javascript-date
@@ -256,7 +299,6 @@ export default class Home extends Component {
     const { showMenuModal } = this.state
     const { product } = this.state
     const { selectedProducts } = this.state
-    const { selectedProductTitles } = this.state
 
     return (
       <div
@@ -300,10 +342,14 @@ export default class Home extends Component {
               onRequestCloseMenu={this.onRequestCloseMenu}
               menu={this.state.menu}
               formatDate={this.formatDate}
-              dataSource={this.state.selectedProductTitles}
+              dataSource={this.state.selectedProducts}
+              dataSourceConfig={this.dataSourceConfig}
               searchText={this.state.searchText}
-              inputList={this.state.inputList}
-              onAddBtnClick={this.onAddBtnClick}
+              handleAddDailyMenu={this.handleAddDailyMenu} 
+              handleRemoveDailyMenu={this.handleRemoveDailyMenu}
+              handleDailyMenuQtyChange={this.handleDailyMenuQtyChange}
+              handleDailyMenuNameChange={this.handleDailyMenuNameChange}    
+              dailyMenu={this.state.dailyMenus}        
             />
 
           )}

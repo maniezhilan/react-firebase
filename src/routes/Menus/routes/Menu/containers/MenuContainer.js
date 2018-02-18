@@ -19,26 +19,39 @@ import classes from './MenuContainer.scss'
   menu: dataToJS(firebase, `menus/${params.Menuid}`)
 }))
 export default class Menu extends Component {
+  constructor(props) {
+    super(props);
+  }
+
   static propTypes = {
     menu: PropTypes.object,
     params: PropTypes.object.isRequired
   }
 
+
+
+  onSubmit() {
+
+  }
+
+
+  
   render() {
-    const { menu, params } = this.props
+    const {  params } = this.props
+    const { menu } = this.state
+    console.log('Menu ----',menu);
+    if (isEmpty(menu)) {
+      return <div>Menu Container is isEmpty</div>
+    }
 
-    // if (isEmpty(menu)) {
-    //   return <div>Menu Container is isEmpty</div>
-    // }
-
-    // if (!isLoaded(menu)) {
-    //   return <LoadingSpinner />
-    // }
+    if (!isLoaded(menu)) {
+      return <LoadingSpinner />
+    }
 
     return (
       <div className={classes.container}>
         <h2>Menu Container</h2>
-        <NewMenuForm/>
+       
       </div>
     )
   }
