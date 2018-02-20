@@ -14,7 +14,10 @@ import { MENU_PATH } from 'constants'
 import LoadingSpinner from 'components/LoadingSpinner'
 import { List } from 'material-ui/List'
 import Paper from 'material-ui/Paper'
-import Subheader from 'material-ui/Subheader'
+import { GridList, GridTile } from 'material-ui/GridList';
+import IconButton from 'material-ui/IconButton';
+import Subheader from 'material-ui/Subheader';
+import StarBorder from 'material-ui/svg-icons/toggle/star-border';
 import RaisedButton from 'material-ui/RaisedButton';
 import classes from './MenusContainer.scss'
 import DatePicker from 'material-ui/DatePicker';
@@ -23,12 +26,26 @@ import Product from '../../Home/components/Product'
 import AutoComplete from 'material-ui/AutoComplete';
 import { TextField } from 'redux-form-material-ui'
 
+const styles = {
+  root: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    justifyContent: 'space-around',
+  },
+  gridList: {
+    width: 500,
+    height: 450,
+    overflowY: 'auto',
+  },
+};
+
 @firebaseConnect([
     { path: 'menus', queryParams: ['orderByKey', 'limitToLast=5'] }, // 10 most recent
     { path: 'products', queryParams: ['orderByKey', 'limitToLast=5'] }
 ])
 @connect(({ firebase }, { params }) => ({
   auth: pathToJS(firebase, 'auth'),
+  account: pathToJS(firebase, 'profile'),
   menus: dataToJS(firebase, 'menus'),
   products: dataToJS(firebase, 'products')
 }))
@@ -41,17 +58,17 @@ export default class Menus extends Component {
     this.state = {
       error: null,
       menu: Object.assign({}, this.props.menu),
-      searchText: '',
+      //searchText: '',
       date: Object.assign({}, this.props.date),
-      name: '',
-      quantity: '',
-      dailyMenus: [{ name: '', quantity: '', searchText: ''}],
+      //name: '',
+      //quantity: '',
+      dailyMenus: [{ name: '', quantity: 0, searchText: ''}],
       showMenuForm: false,
       selectedProducts: Object.assign([], this.props.selectedProducts)
     }
     this.handleRemoveDailyMenu = this.handleRemoveDailyMenu.bind(this)
     this.handleDailyMenuNameChange = this.handleDailyMenuNameChange.bind(this)
-    this.handleUpdateInput = this.handleUpdateInput.bind(this);
+    //this.handleUpdateInput = this.handleUpdateInput.bind(this);
     this.saveMenu = this.saveMenu.bind(this)
   }
 
@@ -111,23 +128,7 @@ export default class Menus extends Component {
     });
   };
 
-  // handleNameChange = (evt) => {
-  //   this.setState({ name: evt.target.value });
-  //   console.log('handleNameChange---', this.state.name)
-  // }
-
-  // handleQtyChange = (evt) => {
-  //   this.setState({ quantity: evt.target.value });
-  // }
-
-  handleUpdateInput = (searchText) => {
-    
-    this.setState({
-      searchText: searchText,
-    });
-    
-    console.log('handleUpdateInput searchText---', this.state.searchText)
-  };
+  
 
   handleDailyMenuNameChange = (idx) => (evt) => {
     const newDailyMenus = this.state.dailyMenus.map((dailyMenu, sidx) => {
@@ -135,10 +136,6 @@ export default class Menus extends Component {
       return { ...dailyMenu, name: evt.text, searchText: evt.text};
     });
     this.setState({dailyMenus: newDailyMenus});
-    console.log('handleDailyMenuNameChange---', this.state.dailyMenus)
-    this.setState({
-      searchText: evt.text,
-    });
   }
 
   handleDailyMenuQtyChange = (idx) => (evt) => {
@@ -154,16 +151,12 @@ export default class Menus extends Component {
 
 
   handleAddDailyMenu = () => {
-    this.setState({ dailyMenus: this.state.dailyMenus.concat([{ name: '', quantity: '', searchText: '' }]) });
+    this.setState({ dailyMenus: this.state.dailyMenus.concat([{ name: '', quantity: 0, searchText: '' }]) });
   }
 
   handleRemoveDailyMenu = (idx) => () => {
     let newDailyMenus = this.state.dailyMenus.filter((s, sidx) => idx !== sidx)
-    //console.log('index--', idx, 'removed menu ----', newDailyMenus)
-    //this.setState({ searchText: searchText})
-    this.setState({ dailyMenus: newDailyMenus },  function(){
-      console.log('index--', idx, 'handleRemoveDailyMenu----', this.state.dailyMenus)
-    });
+    this.setState({ dailyMenus: newDailyMenus });
     
     
   }
@@ -178,7 +171,7 @@ export default class Menus extends Component {
   createMenu = () => {
     this.setState({ showMenuForm: !this.state.showMenuForm })
     let menu = this.state.menu
-    let day = this.state.date
+    let day = this.formatDate(this.state.date)
     menu.dates = []
     menu.dates.push(day)
     menu.dates[day] = this.state.dailyMenus
@@ -204,7 +197,7 @@ export default class Menus extends Component {
     this.setState({ showMenuModal: !this.state.showMenuModal })
     console.log('saveMenu called');
     let menu = this.state.menu
-    let day = this.state.date
+    let day = this.formatDate(this.state.date)
     menu.dates = []
     menu.dates.push(day)
     menu.dates[day] = this.state.dailyMenus
@@ -219,12 +212,11 @@ export default class Menus extends Component {
 
 
   render() {
-    const { products } = this.props
-    const { menus, auth } = this.props
+    const { menus, auth, account, products } = this.props
     const { showMenuForm, searchText, dailyMenus } = this.state
-    // if (!isLoaded(menus, auth)) {
-    //   return <LoadingSpinner />
-    // }
+    if (!isLoaded(menus, auth, account)) {
+      return <LoadingSpinner />
+    }
 
     // Menu Route is being loaded
     if (this.props.children) {
@@ -238,48 +230,48 @@ export default class Menus extends Component {
         <div className={classes.tiles}>
 
           <Paper className={classes.menu}>
-            <Subheader>Menus</Subheader>
-            Menus...
-            
+            <div style={styles.root}>
+              <GridList
+                cellHeight={180}
+                style={styles.gridList}
+              >
+                <Subheader>Weekly Menu</Subheader>
+                {menus &&
+                  map(menus, (menu, id) => (
+                  <GridTile
+                    key={id}
+                    title=""
+                    subtitle=""
+                    actionIcon={<IconButton><StarBorder color="white" /></IconButton>}
+                  >
+                    <img src="http://www.material-ui.com/v0.19.4/images/grid-list/burger-827309_640.jpg" />
+                  </GridTile>
+                ))}
+              </GridList>
+            </div>
+            {account && account.rolename === 'admin' &&    
             <DatePicker
               hintText="Select Date"
               value={this.state.date}
               onChange={this.handleDateChange}
-              //formatDate={this.formatDate}
+              formatDate={this.formatDate}
             />
+            }
+            {account && account.rolename === 'admin' &&
             <RaisedButton label="Create Menu" primary={true}
               onClick={this.createMenu}/>
-
-            {showMenuForm && (
-              // <NewMenuForm
-              //   onSubmit={this.saveMenu}
-              //   //onChange={this.handleDailyMenuNameChange}
-              //   dataSource={this.state.selectedProducts}
-              //   dataSourceConfig={this.dataSourceConfig}
-              //   searchText={this.state.searchText}
-              //   handleAddDailyMenu={this.handleAddDailyMenu}
-              //   handleRemoveDailyMenu={this.handleRemoveDailyMenu}
-              //   handleDailyMenuQtyChange={this.handleDailyMenuQtyChange}
-              //   handleDailyMenuNameChange={this.handleDailyMenuNameChange}
-              //   dailyMenu={this.state.dailyMenus}   
-              //   handleUpdateInput={this.handleUpdateInput}    
-              // />
+            }
+            {account && account.rolename === 'admin' && showMenuForm && (
               <form className={classes.inputs}>
-
                 <List className={classes.list}>
-
                   {dailyMenus.map((dailyMenu, idx) => (
                     <div className="dailyMenu" key={idx}>
                       <AutoComplete
                         hintText={`Type product #${idx + 1} name`}
                         dataSource={this.state.selectedProducts}
                         dataSourceConfig={this.dataSourceConfig}
-                        searchText={dailyMenu.searchText}
-                        filter={(searchText, key) => (key.indexOf(searchText) !== -1)}
                         openOnFocus={true}
                         onNewRequest={this.handleDailyMenuNameChange(idx)}
-                        //onUpdateInput={this.handleUpdateInput}
-                        //value={dailyMenu.name}
                       />
 
                       <TextField
@@ -297,7 +289,7 @@ export default class Menus extends Component {
                 <button type="button" onClick={this.saveMenu} className="small">Save Menu</button>
               </form>
             )}  
-            
+          
           </Paper>  
          
         </div>
