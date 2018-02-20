@@ -40,7 +40,7 @@ const styles = {
 };
 
 @firebaseConnect([
-    { path: 'menus', queryParams: ['orderByKey', 'limitToLast=5'] }, // 10 most recent
+    { path: 'menus', queryParams: ['orderByKey', 'limitToLast=7'] }, // 10 most recent
     { path: 'products', queryParams: ['orderByKey', 'limitToLast=5'] }
 ])
 @connect(({ firebase }, { params }) => ({
@@ -64,12 +64,14 @@ export default class Menus extends Component {
       //quantity: '',
       dailyMenus: [{ name: '', quantity: 0, searchText: ''}],
       showMenuForm: false,
-      selectedProducts: Object.assign([], this.props.selectedProducts)
+      selectedProducts: Object.assign([], this.props.selectedProducts),
+      weeklyMenu: [] 
     }
     this.handleRemoveDailyMenu = this.handleRemoveDailyMenu.bind(this)
     this.handleDailyMenuNameChange = this.handleDailyMenuNameChange.bind(this)
     //this.handleUpdateInput = this.handleUpdateInput.bind(this);
     this.saveMenu = this.saveMenu.bind(this)
+    //this.loadMenus = this.loadMenus.bind(this)
   }
 
   static propTypes = {
@@ -127,6 +129,14 @@ export default class Menus extends Component {
       date: date
     });
   };
+
+  loadMenus = (weeklyMenu) => {
+    let menus = weeklyMenu.filter(function (menu) {
+        console.log(menu);
+        return menu.dates
+      })
+    this.setState({ weeklyMenu: menus})
+  }
 
   
 
@@ -212,12 +222,31 @@ export default class Menus extends Component {
 
 
   render() {
+    
     const { menus, auth, account, products } = this.props
-    const { showMenuForm, searchText, dailyMenus } = this.state
-    if (!isLoaded(menus, auth, account)) {
-      return <LoadingSpinner />
-    }
+    const { showMenuForm, searchText, dailyMenus, weeklyMenu } = this.state
+    
+    // if (!isLoaded(menus, auth, account)) {
+    //   return <LoadingSpinner />
+    // }
+    console.log(menus)
+    let weekly = []
+    if(menus){
 
+      for (var key in menus) {
+        if (menus.hasOwnProperty(key)) {
+          //console.log(key + " -> " + menus[key].dates);
+          let dates = menus[key].dates
+          for (var date in dates){
+            if (dates.hasOwnProperty(date)) {
+              //console.log(date + " -> " + dates[date]);
+              weekly.push(dates[date]);
+            }
+          }
+        }
+      }
+    console.log(weekly)
+    }
     // Menu Route is being loaded
     if (this.props.children) {
       // pass all props to children routes
@@ -230,25 +259,33 @@ export default class Menus extends Component {
         <div className={classes.tiles}>
 
           <Paper className={classes.menu}>
+            
+            <Subheader>Weekly Menu</Subheader>
             <div style={styles.root}>
               <GridList
                 cellHeight={180}
                 style={styles.gridList}
-              >
-                <Subheader>Weekly Menu</Subheader>
-                {menus &&
-                  map(menus, (menu, id) => (
-                  <GridTile
-                    key={id}
-                    title="Burger title"
-                    subtitle="Burger subtitle"
-                    actionIcon={<IconButton><StarBorder color="white" /></IconButton>}
-                  >
-                    <img src="http://www.material-ui.com/v0.19.4/images/grid-list/burger-827309_640.jpg" />
-                  </GridTile>
-                ))}
+              >      
+            {weekly && 
+              map(weekly, (menu,id) => (  
+                          map(menu, (item,date) => ( 
+                          <GridTile
+                            key={date}
+                            title={item.name}
+                            subtitle={<span> Qty <b>{item.quantity}</b></span>}
+                            actionIcon={<IconButton><StarBorder color="white" /></IconButton>}
+                          >
+                            <img src="http://www.material-ui.com/v0.19.4/images/grid-list/burger-827309_640.jpg" />
+                          </GridTile>
+                         ))
+                          
+                          
+                      
+                
+              ))} 
+              
               </GridList>
-            </div>
+              </div>
             {account && account.rolename === 'admin' &&    
             <DatePicker
               hintText="Select Date"
