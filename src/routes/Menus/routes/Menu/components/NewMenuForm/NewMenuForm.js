@@ -21,7 +21,7 @@ export const NewMenuForm = ({
     formatDate,
     dataSource,
     dataSourceConfig,
-    searchText,
+    //searchText,
     handleAddDailyMenu,
     handleRemoveDailyMenu,
     handleDailyMenuQtyChange,
@@ -43,10 +43,10 @@ export const NewMenuForm = ({
                                 hintText={`Type product #${idx + 1} name`}
                                 dataSource={dataSource}
                                 dataSourceConfig={dataSourceConfig}
-                                filter={(searchText, key) => (key.indexOf(searchText) !== -1)}
+                            filter={(searchText, key) => (key.indexOf(dailyMenu.searchText) !== -1)}
                                 openOnFocus={true}
                                 onNewRequest={handleDailyMenuNameChange(idx)}
-                                onUpdateInput={onUpdateInput}
+                                //onUpdateInput={onUpdateInput}
                                 //value={dailyMenu.name}
                             />
                             
@@ -55,7 +55,7 @@ export const NewMenuForm = ({
                                 value={dailyMenu.quantity}
                                 onChange={handleDailyMenuQtyChange(idx)}
                             />
-                        <button type="button" onClick={handleRemoveDailyMenu(idx, searchText)} className="small">-</button>
+                        <button type="button" onClick={handleRemoveDailyMenu(idx)} className="small">-</button>
                         </div>
                     ))}
                     <button type="button" onClick={handleAddDailyMenu} className="small">Add</button>

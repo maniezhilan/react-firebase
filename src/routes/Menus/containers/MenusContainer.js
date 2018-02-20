@@ -52,6 +52,7 @@ export default class Menus extends Component {
     this.handleRemoveDailyMenu = this.handleRemoveDailyMenu.bind(this)
     this.handleDailyMenuNameChange = this.handleDailyMenuNameChange.bind(this)
     this.handleUpdateInput = this.handleUpdateInput.bind(this);
+    this.saveMenu = this.saveMenu.bind(this)
   }
 
   static propTypes = {
@@ -263,7 +264,7 @@ export default class Menus extends Component {
               //   dailyMenu={this.state.dailyMenus}   
               //   handleUpdateInput={this.handleUpdateInput}    
               // />
-              <form onSubmit={this.saveMenu} className={classes.inputs}>
+              <form className={classes.inputs}>
 
                 <List className={classes.list}>
 
@@ -293,7 +294,7 @@ export default class Menus extends Component {
                 </List>
 
 
-                <button type="button" onClick={this.submit} className="small">Save Menu</button>
+                <button type="button" onClick={this.saveMenu} className="small">Save Menu</button>
               </form>
             )}  
             
