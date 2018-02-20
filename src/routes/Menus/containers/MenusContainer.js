@@ -240,8 +240,8 @@ export default class Menus extends Component {
                   map(menus, (menu, id) => (
                   <GridTile
                     key={id}
-                    title=""
-                    subtitle=""
+                    title="Burger title"
+                    subtitle="Burger subtitle"
                     actionIcon={<IconButton><StarBorder color="white" /></IconButton>}
                   >
                     <img src="http://www.material-ui.com/v0.19.4/images/grid-list/burger-827309_640.jpg" />
