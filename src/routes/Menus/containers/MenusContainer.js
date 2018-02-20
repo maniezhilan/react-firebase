@@ -20,7 +20,8 @@ import classes from './MenusContainer.scss'
 import DatePicker from 'material-ui/DatePicker';
 import NewMenuForm from '../routes/Menu/components/NewMenuForm/NewMenuForm'
 import Product from '../../Home/components/Product'
-
+import AutoComplete from 'material-ui/AutoComplete';
+import { TextField } from 'redux-form-material-ui'
 
 @firebaseConnect([
     { path: 'menus', queryParams: ['orderByKey', 'limitToLast=5'] }, // 10 most recent
@@ -44,10 +45,13 @@ export default class Menus extends Component {
       date: Object.assign({}, this.props.date),
       name: '',
       quantity: '',
-      dailyMenus: [{ name: '', quantity: '' }],
+      dailyMenus: [{ name: '', quantity: '', searchText: ''}],
       showMenuForm: false,
       selectedProducts: Object.assign([], this.props.selectedProducts)
     }
+    this.handleRemoveDailyMenu = this.handleRemoveDailyMenu.bind(this)
+    this.handleDailyMenuNameChange = this.handleDailyMenuNameChange.bind(this)
+    this.handleUpdateInput = this.handleUpdateInput.bind(this);
   }
 
   static propTypes = {
@@ -106,20 +110,34 @@ export default class Menus extends Component {
     });
   };
 
-  handleNameChange = (evt) => {
-    this.setState({ name: evt.target.value });
-  }
+  // handleNameChange = (evt) => {
+  //   this.setState({ name: evt.target.value });
+  //   console.log('handleNameChange---', this.state.name)
+  // }
 
-  handleQtyChange = (evt) => {
-    this.setState({ quantity: evt.target.value });
-  }
+  // handleQtyChange = (evt) => {
+  //   this.setState({ quantity: evt.target.value });
+  // }
+
+  handleUpdateInput = (searchText) => {
+    
+    this.setState({
+      searchText: searchText,
+    });
+    
+    console.log('handleUpdateInput searchText---', this.state.searchText)
+  };
 
   handleDailyMenuNameChange = (idx) => (evt) => {
     const newDailyMenus = this.state.dailyMenus.map((dailyMenu, sidx) => {
       if (idx !== sidx) return dailyMenu;
-      return { ...dailyMenu, name: evt.text };
+      return { ...dailyMenu, name: evt.text, searchText: evt.text};
     });
-    this.setState({ dailyMenus: newDailyMenus });
+    this.setState({dailyMenus: newDailyMenus});
+    console.log('handleDailyMenuNameChange---', this.state.dailyMenus)
+    this.setState({
+      searchText: evt.text,
+    });
   }
 
   handleDailyMenuQtyChange = (idx) => (evt) => {
@@ -129,16 +147,24 @@ export default class Menus extends Component {
     });
 
     this.setState({ dailyMenus: newDailyMenus });
+    console.log('handleDailyMenuQtyChange---', this.state.dailyMenus)
   }
 
 
 
   handleAddDailyMenu = () => {
-    this.setState({ dailyMenus: this.state.dailyMenus.concat([{ name: '', quantity: '' }]) });
+    this.setState({ dailyMenus: this.state.dailyMenus.concat([{ name: '', quantity: '', searchText: '' }]) });
   }
 
   handleRemoveDailyMenu = (idx) => () => {
-    this.setState({ dailyMenus: this.state.dailyMenus.filter((s, sidx) => idx !== sidx) });
+    let newDailyMenus = this.state.dailyMenus.filter((s, sidx) => idx !== sidx)
+    //console.log('index--', idx, 'removed menu ----', newDailyMenus)
+    //this.setState({ searchText: searchText})
+    this.setState({ dailyMenus: newDailyMenus },  function(){
+      console.log('index--', idx, 'handleRemoveDailyMenu----', this.state.dailyMenus)
+    });
+    
+    
   }
 
   dataSourceConfig = {
@@ -194,7 +220,7 @@ export default class Menus extends Component {
   render() {
     const { products } = this.props
     const { menus, auth } = this.props
-    const { showMenuForm } = this.state
+    const { showMenuForm, searchText, dailyMenus } = this.state
     // if (!isLoaded(menus, auth)) {
     //   return <LoadingSpinner />
     // }
@@ -224,17 +250,51 @@ export default class Menus extends Component {
               onClick={this.createMenu}/>
 
             {showMenuForm && (
-              <NewMenuForm
-                onSubmit={this.saveMenu}
-                dataSource={this.state.selectedProducts}
-                dataSourceConfig={this.dataSourceConfig}
-                searchText={this.state.searchText}
-                handleAddDailyMenu={this.handleAddDailyMenu}
-                handleRemoveDailyMenu={this.handleRemoveDailyMenu}
-                handleDailyMenuQtyChange={this.handleDailyMenuQtyChange}
-                handleDailyMenuNameChange={this.handleDailyMenuNameChange}
-                dailyMenu={this.state.dailyMenus}       
-              />
+              // <NewMenuForm
+              //   onSubmit={this.saveMenu}
+              //   //onChange={this.handleDailyMenuNameChange}
+              //   dataSource={this.state.selectedProducts}
+              //   dataSourceConfig={this.dataSourceConfig}
+              //   searchText={this.state.searchText}
+              //   handleAddDailyMenu={this.handleAddDailyMenu}
+              //   handleRemoveDailyMenu={this.handleRemoveDailyMenu}
+              //   handleDailyMenuQtyChange={this.handleDailyMenuQtyChange}
+              //   handleDailyMenuNameChange={this.handleDailyMenuNameChange}
+              //   dailyMenu={this.state.dailyMenus}   
+              //   handleUpdateInput={this.handleUpdateInput}    
+              // />
+              <form onSubmit={this.saveMenu} className={classes.inputs}>
+
+                <List className={classes.list}>
+
+                  {dailyMenus.map((dailyMenu, idx) => (
+                    <div className="dailyMenu" key={idx}>
+                      <AutoComplete
+                        hintText={`Type product #${idx + 1} name`}
+                        dataSource={this.state.selectedProducts}
+                        dataSourceConfig={this.dataSourceConfig}
+                        searchText={dailyMenu.searchText}
+                        filter={(searchText, key) => (key.indexOf(searchText) !== -1)}
+                        openOnFocus={true}
+                        onNewRequest={this.handleDailyMenuNameChange(idx)}
+                        //onUpdateInput={this.handleUpdateInput}
+                        //value={dailyMenu.name}
+                      />
+
+                      <TextField
+                        hintText={`Type product #${idx + 1} quantity`}
+                        value={dailyMenu.quantity}
+                        onChange={this.handleDailyMenuQtyChange(idx)}
+                      />
+                      <button type="button" onClick={this.handleRemoveDailyMenu(idx)} className="small">-</button>
+                    </div>
+                  ))}
+                  <button type="button" onClick={this.handleAddDailyMenu} className="small">Add</button>
+                </List>
+
+
+                <button type="button" onClick={this.submit} className="small">Save Menu</button>
+              </form>
             )}  
             
           </Paper>  

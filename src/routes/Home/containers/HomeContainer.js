@@ -104,14 +104,13 @@ export default class Home extends Component {
   }
 
   handleDailyMenuNameChange = (idx) => (evt) => {
-    console.log('Namechange evt', evt)
-    
     const newDailyMenus = this.state.dailyMenus.map((dailyMenu, sidx) => {
       if (idx !== sidx) return dailyMenu;
-      return { ...dailyMenu, name: evt.text };
+      return { ...dailyMenu, name: evt.target.value };
     });
+
     this.setState({ dailyMenus: newDailyMenus });
-    console.log('Namechange',this.state.dailyMenus)
+    console.log('Namecahnge',this.state.dailyMenus)
   }
 
   handleDailyMenuQtyChange = (idx) => (evt) => {
@@ -237,8 +236,6 @@ export default class Home extends Component {
     menu.endDate = this.state.endDate
     menu.selectedProducts = this.state.selectedProducts
     menu.dates = this.getDateRange(menu.startDate, menu.endDate)
-    let day = menu.startDate 
-    menu.dates[day] = this.state.dailyMenus
     console.log(menu.selectedProducts);
   }
 
@@ -249,16 +246,12 @@ export default class Home extends Component {
 
   saveMenu = () => {
     console.log('saveMenu called');
-    let menu = Object.assign({}, this.props.menu)
-    let day = menu.startDate
-    menu.dates[day] = this.state.dailyMenus
     this.setState({ showMenuModal: !this.state.showMenuModal })
     const { menus, auth, firebase } = this.props
     if (!auth || !auth.uid || !auth.rolename === 'admin') {
       return this.setState({ error: 'You must be Logged into Add' })
     }
-    console.log(" menu items",menu.dates)
-    this.props.firebase.pushWithMeta('/menus',menu)
+    this.props.firebase.pushWithMeta('/menus',this.state.menu)
   }
 
   //https://stackoverflow.com/questions/3552461/how-to-format-a-javascript-date

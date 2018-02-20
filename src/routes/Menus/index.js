@@ -21,14 +21,14 @@ export default store => ({
       'Menus'
     )
   },
-  getChildRoutes(partialNextState, cb) {
-    require.ensure([], require => {
-      /*  Webpack - use require callback to define
-          dependencies for bundling   */
-      const menu = require('./routes/menu').default
-      //const newMenu = require('./routes/newMenu').default
-      /*  Return getComponent   */
-      cb(null, [menu(store)])
-    })
-  }
+  // getChildRoutes(partialNextState, cb) {
+  //   require.ensure([], require => {
+  //     /*  Webpack - use require callback to define
+  //         dependencies for bundling   */
+  //     const menu = require('./routes/menu').default
+  //     //const newMenu = require('./routes/newMenu').default
+  //     /*  Return getComponent   */
+  //     cb(null, [menu(store)])
+  //   })
+  // }
 })

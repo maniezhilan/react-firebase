@@ -27,7 +27,9 @@ export const NewMenuForm = ({
     handleDailyMenuQtyChange,
     handleDailyMenuNameChange,
     dailyMenu,
-    saveMenu
+    saveMenu,
+    onUpdateInput
+    
 
 }) => (
        
@@ -44,7 +46,8 @@ export const NewMenuForm = ({
                                 filter={(searchText, key) => (key.indexOf(searchText) !== -1)}
                                 openOnFocus={true}
                                 onNewRequest={handleDailyMenuNameChange(idx)}
-                                value={dailyMenu.name}
+                                onUpdateInput={onUpdateInput}
+                                //value={dailyMenu.name}
                             />
                             
                             <TextField
@@ -52,7 +55,7 @@ export const NewMenuForm = ({
                                 value={dailyMenu.quantity}
                                 onChange={handleDailyMenuQtyChange(idx)}
                             />
-                            <button type="button" onClick={handleRemoveDailyMenu(idx)} className="small">-</button>
+                        <button type="button" onClick={handleRemoveDailyMenu(idx, searchText)} className="small">-</button>
                         </div>
                     ))}
                     <button type="button" onClick={handleAddDailyMenu} className="small">Add</button>
