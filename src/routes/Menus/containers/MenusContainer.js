@@ -183,7 +183,7 @@ export default class Menus extends Component {
     let menu = this.state.menu
     let day = this.formatDate(this.state.date)
     menu.dates = []
-    menu.dates.push(day)
+    //menu.dates.push(day)
     menu.dates[day] = this.state.dailyMenus
     let productDataSource = []
     map(this.props.products, (product, id) => (
@@ -209,7 +209,7 @@ export default class Menus extends Component {
     let menu = this.state.menu
     let day = this.formatDate(this.state.date)
     menu.dates = []
-    menu.dates.push(day)
+    //menu.dates.push(day)
     menu.dates[day] = this.state.dailyMenus
 
     const { menus, auth, firebase } = this.props
