@@ -25,6 +25,8 @@ import NewMenuForm from '../routes/Menu/components/NewMenuForm/NewMenuForm'
 import Product from '../../Home/components/Product'
 import AutoComplete from 'material-ui/AutoComplete';
 import { TextField } from 'redux-form-material-ui'
+import FloatingActionButton from 'material-ui/FloatingActionButton';
+import ContentAdd from 'material-ui/svg-icons/content/add';
 
 const styles = {
   root: {
@@ -320,14 +322,16 @@ export default class Menus extends Component {
                         value={dailyMenu.quantity}
                         onChange={this.handleDailyMenuQtyChange(idx)}
                       />
-                      <button type="button" onClick={this.handleRemoveDailyMenu(idx)} className="small">-</button>
+                      <RaisedButton label="Delete" secondary={true} onClick={() => { if (confirm('Delete the item?')) { this.handleRemoveDailyMenu(idx) }; }} />
                     </div>
                   ))}
-                  <button type="button" onClick={this.handleAddDailyMenu} className="small">Add</button>
+                  <FloatingActionButton mini={true} secondary={true} onClick={this.handleAddDailyMenu}>
+                    <ContentAdd />
+                  </FloatingActionButton>
                 </List>
 
 
-                <button type="button" onClick={this.saveMenu} className="small">Save Menu</button>
+                <RaisedButton label="Save" primary={true} onClick={this.saveMenu}/>
               </form>
             )}  
           
