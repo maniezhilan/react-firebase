@@ -261,6 +261,7 @@ export default class Menus extends Component {
           <Paper className={classes.menu}>
             
             <Subheader>Weekly Menu</Subheader>
+            {!account && !showMenuForm &&
             <div style={styles.root}>
               <GridList
                 cellHeight={180}
@@ -286,6 +287,7 @@ export default class Menus extends Component {
               
               </GridList>
               </div>
+            }
             {account && account.rolename === 'admin' &&    
             <DatePicker
               hintText="Select Date"
@@ -309,6 +311,8 @@ export default class Menus extends Component {
                         dataSourceConfig={this.dataSourceConfig}
                         openOnFocus={true}
                         onNewRequest={this.handleDailyMenuNameChange(idx)}
+                        searchText={dailyMenu.searchText}
+                        filter={(searchText, key) => (key.indexOf(dailyMenu.searchText) !== -1)}
                       />
 
                       <TextField
