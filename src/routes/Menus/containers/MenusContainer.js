@@ -142,6 +142,12 @@ export default class Menus extends Component {
   }
 
   handleDateChange = (event, date) => {
+    // if (day in this.state.menu){//TODO: Need to verfiy in DB
+    //   console.log('inside if --saveMenu--', day)
+    //   this.setState({open:!this.state.open})
+    //   return this.setState({ error: '`Menu exists for ${day}`' })
+    // }
+
     this.setState({
       date: date
     });
@@ -197,17 +203,11 @@ export default class Menus extends Component {
 
   createMenu = () => {
     this.setState({ showMenuForm: !this.state.showMenuForm })
-    //let menu = this.state.menu
-    //let day = this.state.date
-    //menu.dates = []
-    //menu.dates.push(day)
-    //this.state.menu.dates[day] = this.state.dailyMenus
     let productDataSource = []
     map(this.props.products, (product, id) => (
       productDataSource.push(product)
     ))
     this.setState({ selectedProducts: productDataSource })
-    //this.setState({menu:menu})
   }
 
   createProductDatasource =() => {
@@ -215,33 +215,27 @@ export default class Menus extends Component {
     map(this.props.products, (product, id) => (
       productDataSource.push(product)
     ))
-    console.log(productDataSource);
     return productDataSource
   }
 
+  checkIfMenuExists = (menus,day) => {
+    menus.once('value', function (snapshot) {
+      if (snapshot.hasChild(day)) {
+        this.setState({ open: !this.state.open })
+        return this.setState({ error: '`Menu exists for ${day}`' })
+      }
+    });
+  }
+
   saveMenu = () => {
-    
-    this.setState({ showMenuModal: !this.state.showMenuModal })
-    // console.log('saveMenu called');
-    // let menu = this.state.menu
+    this.setState({ showMenuForm: false })
     let day = this.formatDate(this.state.date)
-    //menu.dates = []
-    //menu.dates.push(day)
-    console.log('saveMenu--', day, this.state.menu)
-    if (day in this.state.menu){
-      console.log('inside if --saveMenu--', day)
-      this.setState({open:!this.state.open})
-      return this.setState({ error: '`Menu exists for ${day}`' })
-    }
-    this.state.menu[day] = this.state.dailyMenus
-
-    // const { menus, auth, firebase } = this.props
-    // if (!auth || !auth.uid || !auth.rolename === 'admin') {
-    //   return this.setState({ error: 'You must be Logged into Add' })
+    // if (day in this.state.menu){//TODO: Need to verfiy in DB
+    //   console.log('inside if --saveMenu--', day)
+    //   this.setState({open:!this.state.open})
+    //   return this.setState({ error: '`Menu exists for ${day}`' })
     // }
-    // console.log(" menu items", this.state.menu)
-    // this.props.firebase.pushWithMeta('/menus', this.state.menu)
-
+    this.state.menu[day] = this.state.dailyMenus
     const { firebase: { updateWithMeta } } = this.props
     // push new project with updatedBy and updatedAt
     return this.props.firebase.update(`/menus/-L5lboFK__WG4oZvehYv`, this.state.menu).catch(err => {
@@ -249,6 +243,7 @@ export default class Menus extends Component {
       this.setState({ error: 'Error updating daily menu' })
       return Promise.reject(err)
     })
+    
   }
 
   menuDaysList = () => {
@@ -271,41 +266,18 @@ export default class Menus extends Component {
     
     const { menus, auth, account, products } = this.props
     const { showMenuForm, searchText, dailyMenus, weeklyMenu, open } = this.state
-    
-    // if (!isLoaded(menus, auth, account)) {
-    //   return <LoadingSpinner />
-    // }
-    //console.log(menus)
     let weekly = []
+    let days = []
     if(menus){
     Object.keys(menus).forEach(key => {
-      //console.log(key);          // the name of the current key.
-      //console.log(menus[key]);   // the value of the current key.
       let weeklyMenu = menus[key]
       Object.keys(weeklyMenu).forEach(key => {
-        //console.log(key);
-        //console.log(weeklyMenu[key]);
+        days.push(key)
         weekly.push(weeklyMenu[key]);
       });
     });
   }
-    // let weekly = []
-    // if(menus){
-
-    //   for (var key in menus) {
-    //     if (menus.hasOwnProperty(key)) {
-    //       //console.log(key + " -> " + menus[key].dates);
-    //       let dates = menus[key].dates
-    //       for (var date in dates){
-    //         if (dates.hasOwnProperty(date)) {
-    //           //console.log(date + " -> " + dates[date]);
-    //           weekly.push(dates[date]);
-    //         }
-    //       }
-    //     }
-    //   }
-    // //console.log(weekly)
-    // }
+    
     // Menu Route is being loaded
     if (this.props.children) {
       // pass all props to children routes
@@ -320,9 +292,16 @@ export default class Menus extends Component {
           <Paper className={classes.menu}>
             
             <Subheader>Weekly Menu</Subheader>
-            {account && account.rolename === 'admin' &&
+            {account && account.rolename === 'admin' && !showMenuForm && 
                <div> 
-
+              <List className={classes.list}>   
+              {days &&
+                map(days, (date, id) => (
+                  <ListItem key={id}>
+                  <a href="#" key={id}>{date}</a>
+                  </ListItem>
+                ))} 
+               </List>               
               </div>
             }
             {!account && !showMenuForm &&
@@ -411,7 +390,10 @@ export default class Menus extends Component {
                 <RaisedButton label="Save" primary={true} onClick={this.saveMenu}/>
               </form>
             )}  
-          
+            //TODO: 1. Show List of Menu's
+            //TODO: 2. Edit Menu
+            
+            
           </Paper>  
          
         </div>
