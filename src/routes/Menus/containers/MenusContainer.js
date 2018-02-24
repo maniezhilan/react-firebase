@@ -12,7 +12,7 @@ import {
 } from 'react-redux-firebase'
 import { MENU_PATH } from 'constants'
 import LoadingSpinner from 'components/LoadingSpinner'
-import { List } from 'material-ui/List'
+import { List, ListItem } from 'material-ui/List'
 import Paper from 'material-ui/Paper'
 import { GridList, GridTile } from 'material-ui/GridList';
 import IconButton from 'material-ui/IconButton';
@@ -27,6 +27,7 @@ import AutoComplete from 'material-ui/AutoComplete';
 import { TextField } from 'redux-form-material-ui'
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';
+import Snackbar from 'material-ui/Snackbar';
 
 const styles = {
   root: {
@@ -67,7 +68,9 @@ export default class Menus extends Component {
       dailyMenus: [{ name: '', quantity: 0, searchText: ''}],
       showMenuForm: false,
       selectedProducts: Object.assign([], this.props.selectedProducts),
-      weeklyMenu: [] 
+      weeklyMenu: [],
+      open: false
+
     }
     this.handleRemoveDailyMenu = this.handleRemoveDailyMenu.bind(this)
     this.handleDailyMenuNameChange = this.handleDailyMenuNameChange.bind(this)
@@ -96,6 +99,18 @@ export default class Menus extends Component {
       email: PropTypes.string
     })
   }
+
+  handleClick = () => {
+    this.setState({
+      open: true,
+    });
+  };
+
+  handleRequestClose = () => {
+    this.setState({
+      open: false,
+    });
+  };
 
   //https://stackoverflow.com/questions/3552461/how-to-format-a-javascript-date
   formatDate = (date) => {
@@ -153,7 +168,7 @@ export default class Menus extends Component {
   handleDailyMenuQtyChange = (idx) => (evt) => {
     const newDailyMenus = this.state.dailyMenus.map((dailyMenu, sidx) => {
       if (idx !== sidx) return dailyMenu;
-      return { ...dailyMenu, quantity: evt.target.value };
+      return { ...dailyMenu, quantity: evt.target.value};
     });
 
     this.setState({ dailyMenus: newDailyMenus });
@@ -182,17 +197,17 @@ export default class Menus extends Component {
 
   createMenu = () => {
     this.setState({ showMenuForm: !this.state.showMenuForm })
-    let menu = this.state.menu
-    let day = this.formatDate(this.state.date)
-    menu.dates = []
+    //let menu = this.state.menu
+    //let day = this.state.date
+    //menu.dates = []
     //menu.dates.push(day)
-    menu.dates[day] = this.state.dailyMenus
+    //this.state.menu.dates[day] = this.state.dailyMenus
     let productDataSource = []
     map(this.props.products, (product, id) => (
       productDataSource.push(product)
     ))
     this.setState({ selectedProducts: productDataSource })
-    this.setState({menu:menu})
+    //this.setState({menu:menu})
   }
 
   createProductDatasource =() => {
@@ -207,48 +222,90 @@ export default class Menus extends Component {
   saveMenu = () => {
     
     this.setState({ showMenuModal: !this.state.showMenuModal })
-    console.log('saveMenu called');
-    let menu = this.state.menu
+    // console.log('saveMenu called');
+    // let menu = this.state.menu
     let day = this.formatDate(this.state.date)
-    menu.dates = []
+    //menu.dates = []
     //menu.dates.push(day)
-    menu.dates[day] = this.state.dailyMenus
-
-    const { menus, auth, firebase } = this.props
-    if (!auth || !auth.uid || !auth.rolename === 'admin') {
-      return this.setState({ error: 'You must be Logged into Add' })
+    console.log('saveMenu--', day, this.state.menu)
+    if (day in this.state.menu){
+      console.log('inside if --saveMenu--', day)
+      this.setState({open:!this.state.open})
+      return this.setState({ error: '`Menu exists for ${day}`' })
     }
-    console.log(" menu items", this.state.menu)
-    this.props.firebase.pushWithMeta('/menus', this.state.menu)
+    this.state.menu[day] = this.state.dailyMenus
+
+    // const { menus, auth, firebase } = this.props
+    // if (!auth || !auth.uid || !auth.rolename === 'admin') {
+    //   return this.setState({ error: 'You must be Logged into Add' })
+    // }
+    // console.log(" menu items", this.state.menu)
+    // this.props.firebase.pushWithMeta('/menus', this.state.menu)
+
+    const { firebase: { updateWithMeta } } = this.props
+    // push new project with updatedBy and updatedAt
+    return this.props.firebase.update(`/menus/-L5lboFK__WG4oZvehYv`, this.state.menu).catch(err => {
+      console.error('Error updating daily menu: ', err) // eslint-disable-line no-console
+      this.setState({ error: 'Error updating daily menu' })
+      return Promise.reject(err)
+    })
+  }
+
+  menuDaysList = () => {
+      let menuDaysList = []
+      Object.keys(menus).map(function (keyName, keyIndex) {
+      let menu = menus[keyName]
+        Object.keys(menu).map(function (keyName, keyIndex) {
+          let dates = menu.dates
+          Object.keys(dates).map(function (keyName, keyIndex) {
+            menuDaysList.push(keyName);   
+            return menuDaysList
+          })
+        })
+      })
+    
   }
 
 
   render() {
     
     const { menus, auth, account, products } = this.props
-    const { showMenuForm, searchText, dailyMenus, weeklyMenu } = this.state
+    const { showMenuForm, searchText, dailyMenus, weeklyMenu, open } = this.state
     
     // if (!isLoaded(menus, auth, account)) {
     //   return <LoadingSpinner />
     // }
-    console.log(menus)
+    //console.log(menus)
     let weekly = []
     if(menus){
+    Object.keys(menus).forEach(key => {
+      //console.log(key);          // the name of the current key.
+      //console.log(menus[key]);   // the value of the current key.
+      let weeklyMenu = menus[key]
+      Object.keys(weeklyMenu).forEach(key => {
+        //console.log(key);
+        //console.log(weeklyMenu[key]);
+        weekly.push(weeklyMenu[key]);
+      });
+    });
+  }
+    // let weekly = []
+    // if(menus){
 
-      for (var key in menus) {
-        if (menus.hasOwnProperty(key)) {
-          //console.log(key + " -> " + menus[key].dates);
-          let dates = menus[key].dates
-          for (var date in dates){
-            if (dates.hasOwnProperty(date)) {
-              //console.log(date + " -> " + dates[date]);
-              weekly.push(dates[date]);
-            }
-          }
-        }
-      }
-    console.log(weekly)
-    }
+    //   for (var key in menus) {
+    //     if (menus.hasOwnProperty(key)) {
+    //       //console.log(key + " -> " + menus[key].dates);
+    //       let dates = menus[key].dates
+    //       for (var date in dates){
+    //         if (dates.hasOwnProperty(date)) {
+    //           //console.log(date + " -> " + dates[date]);
+    //           weekly.push(dates[date]);
+    //         }
+    //       }
+    //     }
+    //   }
+    // //console.log(weekly)
+    // }
     // Menu Route is being loaded
     if (this.props.children) {
       // pass all props to children routes
@@ -263,45 +320,64 @@ export default class Menus extends Component {
           <Paper className={classes.menu}>
             
             <Subheader>Weekly Menu</Subheader>
+            {account && account.rolename === 'admin' &&
+               <div> 
+
+              </div>
+            }
             {!account && !showMenuForm &&
             <div style={styles.root}>
               <GridList
                 cellHeight={180}
                 style={styles.gridList}
               >      
-            {weekly && 
-              map(weekly, (menu,id) => (  
-                          map(menu, (item,date) => ( 
+                {weekly && 
+                  map(weekly, (date,id) => (  
+                          map(date, (item,id) => ( 
                           <GridTile
-                            key={date}
+                            key={id}
                             title={item.name}
-                            subtitle={<span> Qty <b>{item.quantity}</b></span>}
+                            subtitle={<span> Qty <b>{(item.quantity === '0') ? 'Sold out': item.quantity }</b></span>}
                             actionIcon={<IconButton><StarBorder color="white" /></IconButton>}
+                            actionPosition="left"
+                            titlePosition="top"
+                            
+                            
                           >
                             <img src="http://www.material-ui.com/v0.19.4/images/grid-list/burger-827309_640.jpg" />
                           </GridTile>
                          ))
-                          
-                          
-                      
-                
               ))} 
               
               </GridList>
               </div>
             }
-            {account && account.rolename === 'admin' &&    
-            <DatePicker
-              hintText="Select Date"
-              value={this.state.date}
-              onChange={this.handleDateChange}
-              formatDate={this.formatDate}
-            />
+            
+                
+            
+            
+            {account && account.rolename === 'admin' &&
+              <DatePicker
+                hintText="Select Date"
+                value={this.state.date}
+                onChange={this.handleDateChange}
+                formatDate={this.formatDate}
+              />
+              
             }
+
+            {account && account.rolename === 'admin' && open &&
+              <Snackbar
+                open={open}
+                message={`Menu already exists for ${this.formatDate(this.state.date)}`}
+                autoHideDuration={4000}
+                onRequestClose={this.handleRequestClose}
+              />
+            }  
             {account && account.rolename === 'admin' &&
             <RaisedButton label="Create Menu" primary={true}
-              onClick={this.createMenu}/>
-            }
+            onClick={this.createMenu}/>
+            } 
             {account && account.rolename === 'admin' && showMenuForm && (
               <form className={classes.inputs}>
                 <List className={classes.list}>
@@ -321,6 +397,7 @@ export default class Menus extends Component {
                         hintText={`Type product #${idx + 1} quantity`}
                         value={dailyMenu.quantity}
                         onChange={this.handleDailyMenuQtyChange(idx)}
+                        type='number'
                       />
                       <RaisedButton label="Delete" secondary={true} onClick={() => { if (confirm('Delete the item?')) { this.handleRemoveDailyMenu(idx) }; }} />
                     </div>
