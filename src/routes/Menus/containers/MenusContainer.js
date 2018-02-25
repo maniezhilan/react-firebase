@@ -69,13 +69,15 @@ export default class Menus extends Component {
       showMenuForm: false,
       selectedProducts: Object.assign([], this.props.selectedProducts),
       weeklyMenu: [],
-      open: false
+      open: false,
+      edit: false
 
     }
     this.handleRemoveDailyMenu = this.handleRemoveDailyMenu.bind(this)
     this.handleDailyMenuNameChange = this.handleDailyMenuNameChange.bind(this)
     //this.handleUpdateInput = this.handleUpdateInput.bind(this);
     this.saveMenu = this.saveMenu.bind(this)
+    this.editMenu = this.editMenu.bind(this)
     //this.loadMenus = this.loadMenus.bind(this)
   }
 
@@ -147,7 +149,6 @@ export default class Menus extends Component {
     //   this.setState({open:!this.state.open})
     //   return this.setState({ error: '`Menu exists for ${day}`' })
     // }
-
     this.setState({
       date: date
     });
@@ -190,7 +191,7 @@ export default class Menus extends Component {
   handleRemoveDailyMenu = (idx) => () => {
     let newDailyMenus = this.state.dailyMenus.filter((s, sidx) => idx !== sidx)
     this.setState({ dailyMenus: newDailyMenus });
-    
+    console.log('handleRemoveDailyMenu---', newDailyMenus)
     
   }
 
@@ -202,12 +203,29 @@ export default class Menus extends Component {
 
 
   createMenu = () => {
+    console.log('---editMenu---', this.state.edit);
     this.setState({ showMenuForm: !this.state.showMenuForm })
     let productDataSource = []
     map(this.props.products, (product, id) => (
       productDataSource.push(product)
     ))
     this.setState({ selectedProducts: productDataSource })
+  }
+
+  editMenu = (event) => {
+    this.setState({ edit: !this.state.edit })
+    console.log('---editMenu---', this.state.edit);
+    
+    this.setState({ showMenuForm: !this.state.showMenuForm })
+    this.setState({ date: this.formatDate(new Date(event.target.text))})
+    let productDataSource = []
+    map(this.props.products, (product, id) => (
+      productDataSource.push(product)
+    ))
+    this.setState({ selectedProducts: productDataSource })
+    console.log(this.props.menus, '---', this.props.menus['-L5lboFK__WG4oZvehYv'][event.target.text])
+    this.setState({ dailyMenus: this.props.menus['-L5lboFK__WG4oZvehYv'][event.target.text]})
+
   }
 
   createProductDatasource =() => {
@@ -218,24 +236,22 @@ export default class Menus extends Component {
     return productDataSource
   }
 
-  checkIfMenuExists = (menus,day) => {
-    menus.once('value', function (snapshot) {
-      if (snapshot.hasChild(day)) {
-        this.setState({ open: !this.state.open })
-        return this.setState({ error: '`Menu exists for ${day}`' })
-      }
-    });
-  }
+  
 
   saveMenu = () => {
-    this.setState({ showMenuForm: false })
-    let day = this.formatDate(this.state.date)
-    // if (day in this.state.menu){//TODO: Need to verfiy in DB
-    //   console.log('inside if --saveMenu--', day)
-    //   this.setState({open:!this.state.open})
-    //   return this.setState({ error: '`Menu exists for ${day}`' })
-    // }
+    this.setState({ showMenuForm: !this.state.showMenuForm })
+    let day = this.state.date
+    if(!this.state.edit){
+      day = this.formatDate(this.state.date)
+    }
+    console.log(' --saveMenu--', day, this.props.menus, 'edit', this.state.edit)
+    if (day in this.props.menus['-L5lboFK__WG4oZvehYv'] && !this.state.edit){//TODO: Need to verfiy in DB
+      console.log('inside if --saveMenu--', day)
+      this.setState({open:!this.state.open})
+      return this.setState({ error: '`Menu exists for ${day}`' })
+    }
     this.state.menu[day] = this.state.dailyMenus
+    
     const { firebase: { updateWithMeta } } = this.props
     // push new project with updatedBy and updatedAt
     return this.props.firebase.update(`/menus/-L5lboFK__WG4oZvehYv`, this.state.menu).catch(err => {
@@ -243,7 +259,7 @@ export default class Menus extends Component {
       this.setState({ error: 'Error updating daily menu' })
       return Promise.reject(err)
     })
-    
+    this.setState({ edit: !this.state.edit })
   }
 
   menuDaysList = () => {
@@ -265,7 +281,7 @@ export default class Menus extends Component {
   render() {
     
     const { menus, auth, account, products } = this.props
-    const { showMenuForm, searchText, dailyMenus, weeklyMenu, open } = this.state
+    const { showMenuForm, searchText, dailyMenus, weeklyMenu, open, edit, date } = this.state
     let weekly = []
     let days = []
     if(menus){
@@ -298,7 +314,7 @@ export default class Menus extends Component {
               {days &&
                 map(days, (date, id) => (
                   <ListItem key={id}>
-                  <a href="#" key={id}>{date}</a>
+                    <a  key={id} onClick={this.editMenu}>{date}</a>
                   </ListItem>
                 ))} 
                </List>               
@@ -335,7 +351,7 @@ export default class Menus extends Component {
                 
             
             
-            {account && account.rolename === 'admin' &&
+            {account && account.rolename === 'admin' && 
               <DatePicker
                 hintText="Select Date"
                 value={this.state.date}
@@ -348,19 +364,19 @@ export default class Menus extends Component {
             {account && account.rolename === 'admin' && open &&
               <Snackbar
                 open={open}
-                message={`Menu already exists for ${this.formatDate(this.state.date)}`}
+                message={`Menu already exists for ${this.formatDate(date)}`}
                 autoHideDuration={4000}
                 onRequestClose={this.handleRequestClose}
               />
             }  
-            {account && account.rolename === 'admin' &&
+            {account && account.rolename === 'admin' &&  !this.state.edit &&
             <RaisedButton label="Create Menu" primary={true}
             onClick={this.createMenu}/>
             } 
             {account && account.rolename === 'admin' && showMenuForm && (
               <form className={classes.inputs}>
                 <List className={classes.list}>
-                  {dailyMenus.map((dailyMenu, idx) => (
+                  {dailyMenus && dailyMenus.map((dailyMenu, idx) => (
                     <div className="dailyMenu" key={idx}>
                       <AutoComplete
                         hintText={`Type product #${idx + 1} name`}
@@ -390,10 +406,6 @@ export default class Menus extends Component {
                 <RaisedButton label="Save" primary={true} onClick={this.saveMenu}/>
               </form>
             )}  
-            //TODO: 1. Show List of Menu's
-            //TODO: 2. Edit Menu
-            
-            
           </Paper>  
          
         </div>
