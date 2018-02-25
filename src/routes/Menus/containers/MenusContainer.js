@@ -368,16 +368,16 @@ export default class Menus extends Component {
             }
             
                 
-            
-            
-            {account && account.rolename === 'admin' && 
+            {account && account.rolename === 'admin' && !edit &&
               <DatePicker
                 hintText="Select Date"
                 value={this.state.date}
                 onChange={this.handleDateChange}
                 formatDate={this.formatDate}
               />
-              
+            } 
+            {account && account.rolename === 'admin' && edit &&
+              this.state.date
             }
 
             {account && account.rolename === 'admin' && open &&
