@@ -180,6 +180,7 @@ export default class Menus extends Component {
 
   handleRemoveDailyMenu = (idx) => () => {
     let newDailyMenus = this.state.dailyMenus.filter((s, sidx) => idx !== sidx)
+    console.log('--handleRemoveDailyMenu--', newDailyMenus)
     this.setState({ dailyMenus: newDailyMenus });
   }
 
@@ -221,7 +222,20 @@ export default class Menus extends Component {
     return productDataSource
   }
 
-  
+  updateMenu = () => {
+    this.setState({ edit: !this.state.edit })
+    this.setState({ showMenuForm: !this.state.showMenuForm })
+    let day = this.state.date
+    this.state.menu = this.state.dailyMenus
+    console.log('---updateMenu--Daily', this.state.dailyMenus);
+    console.log('---updateMenu--fullmenu', this.state.menu);
+    return this.props.firebase.set(`/menus/${day}`, this.state.menu).catch(err => {
+      console.error('Error updating daily menu: ', err) // eslint-disable-line no-console
+      this.setState({ error: 'Error updating daily menu' })
+      return Promise.reject(err)
+    })
+    
+  }
 
   saveMenu = () => {
     this.setState({ showMenuForm: !this.state.showMenuForm })
@@ -242,7 +256,7 @@ export default class Menus extends Component {
       this.setState({ error: 'Error Creating daily menu' })
       return Promise.reject(err)
     })
-    this.setState({ edit: !this.state.edit })
+    
   }
 
   menuDaysList = () => {
@@ -385,7 +399,8 @@ export default class Menus extends Component {
                         onChange={this.handleDailyMenuQtyChange(idx)}
                         type='number'
                       />
-                      <RaisedButton label="Delete" secondary={true} onClick={() => { if (confirm('Delete the item?')) { this.handleRemoveDailyMenu(idx) }; }} />
+                      {/* <RaisedButton label="Delete" secondary={true} onClick={() => { if (confirm('Delete the item?')) { this.handleRemoveDailyMenu(idx) }; }} /> */}
+                      <RaisedButton label="Delete" secondary={true} onClick={this.handleRemoveDailyMenu(idx)} />
                     </div>
                   ))}
                   <FloatingActionButton mini={true} secondary={true} onClick={this.handleAddDailyMenu}>
@@ -394,7 +409,7 @@ export default class Menus extends Component {
                 </List>
 
 
-                <RaisedButton label="Save" primary={true} onClick={this.saveMenu}/>
+                <RaisedButton label={(this.state.edit) ? 'Update' : 'Save'} primary={true} onClick={(this.state.edit) ? this.updateMenu : this.saveMenu}/>
               </form>
             )}  
           </Paper>  
