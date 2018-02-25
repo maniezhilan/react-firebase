@@ -15,7 +15,7 @@ import {
   isLoaded,
   isEmpty
 } from 'react-redux-firebase'
-import { LIST_PATH, ACCOUNT_PATH, LOGIN_PATH, SIGNUP_PATH } from 'constants'
+import { LIST_PATH, ACCOUNT_PATH, LOGIN_PATH, SIGNUP_PATH, MENU_PATH } from 'constants'
 import defaultUserImage from 'static/User.png'
 import classes from './Navbar.scss'
 
@@ -93,6 +93,9 @@ export default class Navbar extends Component {
         <Link to={LOGIN_PATH}>
           <FlatButton label="Login" style={buttonStyle} />
         </Link>
+        <Link to={MENU_PATH}>
+          <FlatButton label="Menu" style={buttonStyle} />
+        </Link>
       </div>
     )
 
@@ -115,7 +118,7 @@ export default class Navbar extends Component {
     return (
       <AppBar
         title={
-          <Link to={authExists ? LIST_PATH : '/'} className={classes.brand}>
+          <Link to={authExists ? MENU_PATH : '/login'} className={classes.brand}>
              Virunthu
           </Link>
         }
@@ -125,6 +128,7 @@ export default class Navbar extends Component {
         iconStyleRight={authExists ? avatarStyles.wrapper : {}}
         className={classes.appBar}
       />
+      
     )
   }
 }

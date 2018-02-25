@@ -63,10 +63,7 @@ export default class Menus extends Component {
     this.state = {
       error: null,
       menu: Object.assign({}, this.props.menu),
-      //searchText: '',
       date: Object.assign({}, this.props.date),
-      //name: '',
-      //quantity: '',
       dailyMenus: [{ name: '', quantity: 0, searchText: ''}],
       showMenuForm: false,
       selectedProducts: Object.assign([], this.props.selectedProducts),
@@ -77,10 +74,8 @@ export default class Menus extends Component {
     }
     this.handleRemoveDailyMenu = this.handleRemoveDailyMenu.bind(this)
     this.handleDailyMenuNameChange = this.handleDailyMenuNameChange.bind(this)
-    //this.handleUpdateInput = this.handleUpdateInput.bind(this);
     this.saveMenu = this.saveMenu.bind(this)
     this.editMenu = this.editMenu.bind(this)
-    //this.loadMenus = this.loadMenus.bind(this)
   }
 
   static propTypes = {
@@ -146,11 +141,6 @@ export default class Menus extends Component {
   }
 
   handleDateChange = (event, date) => {
-    // if (day in this.state.menu){//TODO: Need to verfiy in DB
-    //   console.log('inside if --saveMenu--', day)
-    //   this.setState({open:!this.state.open})
-    //   return this.setState({ error: '`Menu exists for ${day}`' })
-    // }
     this.setState({
       date: date
     });
@@ -179,9 +169,7 @@ export default class Menus extends Component {
       if (idx !== sidx) return dailyMenu;
       return { ...dailyMenu, quantity: evt.target.value};
     });
-
     this.setState({ dailyMenus: newDailyMenus });
-    console.log('handleDailyMenuQtyChange---', this.state.dailyMenus)
   }
 
 
@@ -193,8 +181,6 @@ export default class Menus extends Component {
   handleRemoveDailyMenu = (idx) => () => {
     let newDailyMenus = this.state.dailyMenus.filter((s, sidx) => idx !== sidx)
     this.setState({ dailyMenus: newDailyMenus });
-    console.log('handleRemoveDailyMenu---', newDailyMenus)
-    
   }
 
   dataSourceConfig = {
@@ -205,7 +191,6 @@ export default class Menus extends Component {
 
 
   createMenu = () => {
-    console.log('---editMenu---', this.state.edit);
     this.setState({ showMenuForm: !this.state.showMenuForm })
     let productDataSource = []
     map(this.props.products, (product, id) => (
@@ -223,8 +208,8 @@ export default class Menus extends Component {
       productDataSource.push(product)
     ))
     this.setState({ selectedProducts: productDataSource })
-    console.log(this.props.menus, '---', this.props.menus['-L5lboFK__WG4oZvehYv'][date])
-    this.setState({ dailyMenus: this.props.menus['-L5lboFK__WG4oZvehYv'][date]})
+    console.log(this.props.menus, '---', this.props.menus[date])
+    this.setState({ dailyMenus: this.props.menus[date]})
 
   }
 
@@ -244,19 +229,17 @@ export default class Menus extends Component {
     if(!this.state.edit){
       day = this.formatDate(this.state.date)
     }
-    console.log(' --saveMenu--', day, this.props.menus, 'edit', this.state.edit)
-    if (day in this.props.menus['-L5lboFK__WG4oZvehYv'] && !this.state.edit){//TODO: Need to verfiy in DB
-      console.log('inside if --saveMenu--', day)
+    if (this.props.menus && day in this.props.menus && !this.state.edit){
       this.setState({open:!this.state.open})
       return this.setState({ error: '`Menu exists for ${day}`' })
     }
-    this.state.menu[day] = this.state.dailyMenus
+    this.state.menu = this.state.dailyMenus
     
-    const { firebase: { updateWithMeta } } = this.props
+    //const { firebase: { pushWithMeta } } = this.props
     // push new project with updatedBy and updatedAt
-    return this.props.firebase.update(`/menus/-L5lboFK__WG4oZvehYv`, this.state.menu).catch(err => {
-      console.error('Error updating daily menu: ', err) // eslint-disable-line no-console
-      this.setState({ error: 'Error updating daily menu' })
+    return this.props.firebase.set(`/menus/${day}`, this.state.menu).catch(err => {
+      console.error('Error Creating daily menu: ', err) // eslint-disable-line no-console
+      this.setState({ error: 'Error Creating daily menu' })
       return Promise.reject(err)
     })
     this.setState({ edit: !this.state.edit })
@@ -282,17 +265,6 @@ export default class Menus extends Component {
     
     const { menus, auth, account, products } = this.props
     const { showMenuForm, searchText, dailyMenus, weeklyMenu, open, edit, date } = this.state
-    let weekly = []
-    let days = []
-    if(menus){
-    Object.keys(menus).forEach(key => {
-      let weeklyMenu = menus[key]
-      Object.keys(weeklyMenu).forEach(key => {
-        days.push(key)
-        weekly.push(weeklyMenu[key]);
-      });
-    });
-  }
     
     // Menu Route is being loaded
     if (this.props.children) {
@@ -311,8 +283,8 @@ export default class Menus extends Component {
             {account && account.rolename === 'admin' && !showMenuForm && 
                <div> 
               <List className={classes.list}>   
-              {days &&
-                map(days, (date, id) => (
+              {menus &&
+                map(menus, (date, id) => (
                   <ListItem key={id}
                     
                     rightIcon={ account && account.rolename === 'admin' &&
@@ -321,14 +293,14 @@ export default class Menus extends Component {
 
                     secondaryText={
                       <p>
-                        <span className="">{date}</span>
+                        <span className="">{id}</span>
                         <br/>
                       </p>
                     }  
 
                     rightIconButton={account && account.rolename === 'admin' &&
 
-                      <FlatButton label="Edit" secondary={true} onClick={() => this.editMenu(date)}>
+                      <FlatButton label="Edit" secondary={true} onClick={() => this.editMenu(id)}>
 
                       </FlatButton>
                     }
@@ -339,14 +311,14 @@ export default class Menus extends Component {
                </List>               
               </div>
             }
-            {!account && !showMenuForm &&
+            {account && account.rolename !== 'admin' && !showMenuForm && !edit &&
             <div style={styles.root}>
               <GridList
                 cellHeight={180}
                 style={styles.gridList}
               >      
-                {weekly && 
-                  map(weekly, (date,id) => (  
+                {menus && 
+                  map(menus, (date,id) => (  
                           map(date, (item,id) => ( 
                           <GridTile
                             key={id}
