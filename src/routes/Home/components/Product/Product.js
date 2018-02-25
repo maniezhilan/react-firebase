@@ -42,12 +42,12 @@ export default class Product extends Component {
       <div className={classes.container}>
       
         <ListItem
-          leftIcon={ account && account.rolename === 'admin' &&  
-            <Checkbox
-              defaultChecked={product.done}
-            onCheck={() => onSelectClick(product, product._key || id)}
-            />
-          }
+          // leftIcon={ account && account.rolename === 'admin' &&  
+          //   <Checkbox
+          //     defaultChecked={product.done}
+          //   onCheck={() => onSelectClick(product, product._key || id)}
+          //   />
+          // }
           
           // rightIcon={ account && account.rolename === 'admin' &&
           //   <Delete onClick={() => onDeleteClick(product._key || id)} />

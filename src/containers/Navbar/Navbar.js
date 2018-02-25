@@ -119,6 +119,7 @@ export default class Navbar extends Component {
              Virunthu
           </Link>
         }
+        
         showMenuIconButton={false}
         iconElementRight={isLoaded(auth, account) ? rightMenu : null}
         iconStyleRight={authExists ? avatarStyles.wrapper : {}}

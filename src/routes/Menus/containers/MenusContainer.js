@@ -28,6 +28,8 @@ import { TextField } from 'redux-form-material-ui'
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 import Snackbar from 'material-ui/Snackbar';
+import Delete from 'material-ui/svg-icons/action/delete'
+import FlatButton from 'material-ui/FlatButton';
 
 const styles = {
   root: {
@@ -212,19 +214,17 @@ export default class Menus extends Component {
     this.setState({ selectedProducts: productDataSource })
   }
 
-  editMenu = (event) => {
+  editMenu = (date) => {
     this.setState({ edit: !this.state.edit })
-    console.log('---editMenu---', this.state.edit);
-    
     this.setState({ showMenuForm: !this.state.showMenuForm })
-    this.setState({ date: this.formatDate(new Date(event.target.text))})
+    this.setState({ date: date})
     let productDataSource = []
     map(this.props.products, (product, id) => (
       productDataSource.push(product)
     ))
     this.setState({ selectedProducts: productDataSource })
-    console.log(this.props.menus, '---', this.props.menus['-L5lboFK__WG4oZvehYv'][event.target.text])
-    this.setState({ dailyMenus: this.props.menus['-L5lboFK__WG4oZvehYv'][event.target.text]})
+    console.log(this.props.menus, '---', this.props.menus['-L5lboFK__WG4oZvehYv'][date])
+    this.setState({ dailyMenus: this.props.menus['-L5lboFK__WG4oZvehYv'][date]})
 
   }
 
@@ -313,9 +313,28 @@ export default class Menus extends Component {
               <List className={classes.list}>   
               {days &&
                 map(days, (date, id) => (
-                  <ListItem key={id}>
-                    <a  key={id} onClick={this.editMenu}>{date}</a>
-                  </ListItem>
+                  <ListItem key={id}
+                    
+                    rightIcon={ account && account.rolename === 'admin' &&
+                    <Delete onClick="" />
+                    }
+
+                    secondaryText={
+                      <p>
+                        <span className="">{date}</span>
+                        <br/>
+                      </p>
+                    }  
+
+                    rightIconButton={account && account.rolename === 'admin' &&
+
+                      <FlatButton label="Edit" secondary={true} onClick={() => this.editMenu(date)}>
+
+                      </FlatButton>
+                    }
+                  
+                  />
+
                 ))} 
                </List>               
               </div>
