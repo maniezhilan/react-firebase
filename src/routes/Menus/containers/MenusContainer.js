@@ -64,7 +64,7 @@ export default class Menus extends Component {
       error: null,
       menu: Object.assign({}, this.props.menu),
       date: Object.assign({}, this.props.date),
-      dailyMenus: [{ name: '', quantity: 0, searchText: ''}],
+      dailyMenus: [{ productId:'',name: '', quantity: 0, searchText: ''}],
       showMenuForm: false,
       selectedProducts: Object.assign([], this.props.selectedProducts),
       weeklyMenu: [],
@@ -146,20 +146,11 @@ export default class Menus extends Component {
     });
   };
 
-  loadMenus = (weeklyMenu) => {
-    let menus = weeklyMenu.filter(function (menu) {
-        console.log(menu);
-        return menu.dates
-      })
-    this.setState({ weeklyMenu: menus})
-  }
-
-  
 
   handleDailyMenuNameChange = (idx) => (evt) => {
     const newDailyMenus = this.state.dailyMenus.map((dailyMenu, sidx) => {
       if (idx !== sidx) return dailyMenu;
-      return { ...dailyMenu, name: evt.text, searchText: evt.text};
+      return { ...dailyMenu, productId: evt.id, name: evt.text, searchText: evt.text};
     });
     this.setState({dailyMenus: newDailyMenus});
   }
@@ -175,7 +166,7 @@ export default class Menus extends Component {
 
 
   handleAddDailyMenu = () => {
-    this.setState({ dailyMenus: this.state.dailyMenus.concat([{ name: '', quantity: 0, searchText: '' }]) });
+    this.setState({ dailyMenus: this.state.dailyMenus.concat([{ productId: '', name: '', quantity: 0, searchText: '' }]) });
   }
 
   handleRemoveDailyMenu = (idx) => () => {
@@ -258,22 +249,6 @@ export default class Menus extends Component {
     })
     
   }
-
-  menuDaysList = () => {
-      let menuDaysList = []
-      Object.keys(menus).map(function (keyName, keyIndex) {
-      let menu = menus[keyName]
-        Object.keys(menu).map(function (keyName, keyIndex) {
-          let dates = menu.dates
-          Object.keys(dates).map(function (keyName, keyIndex) {
-            menuDaysList.push(keyName);   
-            return menuDaysList
-          })
-        })
-      })
-    
-  }
-
 
   render() {
     
