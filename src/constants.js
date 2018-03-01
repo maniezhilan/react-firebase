@@ -14,6 +14,7 @@ export const RECOVER_CODE_FORM_NAME = 'recoverCode'
 export const RECOVER_EMAIL_FORM_NAME = 'recoverEmail'
 export const EDIT_PRODUCT_FORM_NAME = 'editProduct'
 export const CREATE_MENU_FORM_NAME = 'createMenu'
+export const ADD_TO_CART_FORM_NAME = 'addToCart'
 
 export const formNames = {
   account: ACCOUNT_FORM_NAME,
@@ -22,7 +23,8 @@ export const formNames = {
   recoverCode: RECOVER_CODE_FORM_NAME,
   recoverEmail: RECOVER_EMAIL_FORM_NAME,
   EDIT_PRODUCT_FORM_NAME,
-  newMenu:CREATE_MENU_FORM_NAME
+  newMenu:CREATE_MENU_FORM_NAME,
+  addToCart: ADD_TO_CART_FORM_NAME
 }
 
 export const paths = {

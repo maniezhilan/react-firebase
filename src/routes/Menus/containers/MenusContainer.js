@@ -17,7 +17,6 @@ import Paper from 'material-ui/Paper'
 import { GridList, GridTile } from 'material-ui/GridList';
 import IconButton from 'material-ui/IconButton';
 import Subheader from 'material-ui/Subheader';
-import StarBorder from 'material-ui/svg-icons/toggle/star-border';
 import RaisedButton from 'material-ui/RaisedButton';
 import classes from './MenusContainer.scss'
 import DatePicker from 'material-ui/DatePicker';
@@ -30,6 +29,8 @@ import ContentAdd from 'material-ui/svg-icons/content/add';
 import Snackbar from 'material-ui/Snackbar';
 import Delete from 'material-ui/svg-icons/action/delete'
 import FlatButton from 'material-ui/FlatButton';
+import SvgIconAddShoppingCart from "material-ui/svg-icons/action/add-shopping-cart";
+import CartDialog from "../components/CartDIalog"
 
 const styles = {
   root: {
@@ -41,18 +42,24 @@ const styles = {
     width: 500,
     height: 450,
     overflowY: 'auto',
+    
   },
+  gridTile: {
+    cursor: 'pointer'
+  }
 };
 
 @firebaseConnect([
     { path: 'menus', queryParams: ['orderByKey', 'limitToLast=7'] }, // 10 most recent
-    { path: 'products', queryParams: ['orderByKey', 'limitToLast=5'] }
+    { path: 'products', queryParams: ['orderByKey', 'limitToLast=5'] },
+    { path: 'orders', queryParams: ['orderByKey', 'limitToLast=7'] }
 ])
 @connect(({ firebase }, { params }) => ({
   auth: pathToJS(firebase, 'auth'),
   account: pathToJS(firebase, 'profile'),
   menus: dataToJS(firebase, 'menus'),
-  products: dataToJS(firebase, 'products')
+  products: dataToJS(firebase, 'products'),
+  orders: dataToJS(firebase, 'orders')
 }))
 export default class Menus extends Component {
   static contextTypes = {
@@ -65,17 +72,22 @@ export default class Menus extends Component {
       menu: Object.assign({}, this.props.menu),
       date: Object.assign({}, this.props.date),
       dailyMenus: [{ productId:'',name: '', quantity: 0, searchText: ''}],
+      dailyOrders: [{ productId: '', name: '', quantity: 0}],
+      orderDates: [],
       showMenuForm: false,
       selectedProducts: Object.assign([], this.props.selectedProducts),
-      weeklyMenu: [],
       open: false,
-      edit: false
+      edit: false,
+      openCart: false
 
     }
     this.handleRemoveDailyMenu = this.handleRemoveDailyMenu.bind(this)
     this.handleDailyMenuNameChange = this.handleDailyMenuNameChange.bind(this)
     this.saveMenu = this.saveMenu.bind(this)
     this.editMenu = this.editMenu.bind(this)
+    this.addToCart = this.addToCart.bind(this)
+    this.openCart = this.openCart.bind(this)
+    this.onRequestCloseMenu = this.onRequestCloseMenu.bind(this)
   }
 
   static propTypes = {
@@ -249,11 +261,36 @@ export default class Menus extends Component {
     })
     
   }
+//TODO: Add default units of measure in products
+  addToCart = (date,item,qty) => {
+    const newDailyOrders = this.state.dailyOrders.map((dailyOrder, sidx) => {
+      //if (idx !== sidx) return dailyOrder;
+      return { ...dailyOrder, productId: item.productId, name: item.name, quantity: qty };
+    });
+    
+    this.setState({ dailyOrders: newDailyOrders });
+    this.state.orders = this.state.dailyOrders
+    console.log(this.state.orders) 
+    return this.props.firebase.set(`/orders/${this.props.account.username}/${date}`, this.state.orders).catch(err => {
+      console.error('Error Creating daily menu: ', err) // eslint-disable-line no-console
+      this.setState({ error: 'Error Creating daily menu' })
+      return Promise.reject(err)
+    })
+  }
+
+  openCart = () => {
+    this.setState({ openCart: !this.state.openCart }) 
+    console.log('openCart----',this.state.openCart)
+  }
+  onRequestCloseMenu = () => {
+    this.setState({ openCart: !this.state.openCart }) 
+    console.log('closeCart----', this.state.openCart)
+  }
 
   render() {
     
     const { menus, auth, account, products } = this.props
-    const { showMenuForm, searchText, dailyMenus, weeklyMenu, open, edit, date } = this.state
+    const { showMenuForm, searchText, dailyMenus, open, edit, date, openCart, onRequestCloseMenu } = this.state
     
     // Menu Route is being loaded
     if (this.props.children) {
@@ -305,20 +342,22 @@ export default class Menus extends Component {
               <GridList
                 cellHeight={180}
                 style={styles.gridList}
+                
               >      
                 {menus && 
-                  map(menus, (date,id) => (  
+                  map(menus, (date,idx) => (  
                           map(date, (item,id) => ( 
                           <GridTile
                             key={id}
                             title={item.name}
-                            subtitle={<span> Qty <b>{(item.quantity === '0') ? 'Sold out': item.quantity }</b></span>}
-                            actionIcon={<IconButton><StarBorder color="white" /></IconButton>}
-                            actionPosition="left"
-                            titlePosition="top"
-                            
-                            
+                            subtitle={<span> Qty <b>{(item.quantity === '0') ? 'Sold out' : item.quantity}</b><br/>{idx}</span>}
+                            //actionIcon={<IconButton onClick={() => this.addToCart(idx,item,1)}>Order</IconButton>}
+                            actionPosition="right"
+                            titlePosition="bottom"
+                            onClick={this.openCart}
+                            style={styles.gridTile}
                           >
+                          
                             <img src="http://www.material-ui.com/v0.19.4/images/grid-list/burger-827309_640.jpg" />
                           </GridTile>
                          ))
@@ -387,10 +426,21 @@ export default class Menus extends Component {
                 <RaisedButton label={(this.state.edit) ? 'Update' : 'Save'} primary={true} onClick={(this.state.edit) ? this.updateMenu : this.saveMenu}/>
               </form>
             )}  
-          </Paper>  
+          </Paper>
+
+          {openCart &&
+            <CartDialog
+            open = {openCart}
+            onRequestCloseMenu={this.onRequestCloseMenu}
+            menus={menus}
+            handleSubmit=""
+            />
+          }  
          
         </div>
       </div>
+
+      
     )
   }
 }
