@@ -289,7 +289,7 @@ export default class Menus extends Component {
 
   render() {
     
-    const { menus, auth, account, products } = this.props
+    const { menus, auth, account, products, orders } = this.props
     const { showMenuForm, searchText, dailyMenus, open, edit, date, openCart, onRequestCloseMenu } = this.state
     
     // Menu Route is being loaded
@@ -434,6 +434,7 @@ export default class Menus extends Component {
             onRequestCloseMenu={this.onRequestCloseMenu}
             menus={menus}
             handleSubmit=""
+            orders={orders}
             />
           }  
          

@@ -6,15 +6,22 @@ import { Field, reduxForm } from 'redux-form'
 import { map } from 'lodash'
 import classes from './CartDialog.scss'
 import { ADD_TO_CART_FORM_NAME } from 'constants'
+import Cart from './Cart'
+import ProductsList from './ProductsList'
+import ProductItem from './ProductItem'
 
 export const CartDialog = ({
     open,
     onRequestCloseMenu,
     saveCart,
     submit,
-    menus
+    menus,
+    orders,
+    total
 }) => (
     <Dialog
+        autoDetectWindowHeight={false}
+        autoScrollBodyContent={true}
         title="Cart"
         open={open}
         contentClassName={classes.container}
@@ -24,12 +31,22 @@ export const CartDialog = ({
             ]}>
             <form onSubmit={saveCart} className={classes.inputs}>
                 {menus &&
-                    map(menus, (date, idx) => (
-                        map(date, (item, id) => (
-                            <li key={id}>{idx}--{item.name} x {item.quantity}</li>
-                        ))
-                    ))
-                    }
+                    map(menus, (product, date) => (    
+                        <ProductsList title="Products" name={date}>
+                            
+                                {map(product,(item,id) => (
+                                <ProductItem 
+                                    date={date}
+                                    product={item}
+                                    onAddToCartClicked={() => addToCart(item.productId)} />
+                                ))}
+                            
+                        </ProductsList>
+                    ))}
+                <Cart
+                    orders={orders}
+                    total={total}
+                    onCheckoutClicked={() => checkout(orders)} />
             </form>  
            </Dialog>   
 )
