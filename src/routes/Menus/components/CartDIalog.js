@@ -8,45 +8,61 @@ import classes from './CartDialog.scss'
 import { ADD_TO_CART_FORM_NAME } from 'constants'
 import Cart from './Cart'
 import ProductsList from './ProductsList'
-import ProductItem from './ProductItem'
+import ProductItemClass from './ProductItemClass'
+
+let orderDates = []
+function showCart(params) {
+    console.log('showcart--',params)
+
+}
 
 export const CartDialog = ({
     open,
     onRequestCloseMenu,
-    saveCart,
-    submit,
+    handleSubmit,
+    onSubmit,
     menus,
-    orders,
-    total
+    orderDates,
+    total,
+    addToCart,
+    count,
+    increment,
+    decrement,
+    //showCart
 }) => (
     <Dialog
-        autoDetectWindowHeight={false}
+        //autoDetectWindowHeight={true}
         autoScrollBodyContent={true}
         title="Cart"
         open={open}
         contentClassName={classes.container}
             actions={[
                 <FlatButton label="Cancel" secondary onTouchTap={onRequestCloseMenu} />,
-                <FlatButton label="Submit" primary onTouchTap={submit} />
+                <FlatButton label="Submit" primary onTouchTap={onSubmit} />
             ]}>
-            <form onSubmit={saveCart} className={classes.inputs}>
+            <form onSubmit={onSubmit} className={classes.inputs}>
+            
                 {menus &&
                     map(menus, (product, date) => (    
-                        <ProductsList title="Products" name={date}>
+                    <ProductsList title="Products" name={date}>
                             
                                 {map(product,(item,id) => (
-                                <ProductItem 
+                            <ProductItemClass 
+                                    key={id}
                                     date={date}
                                     product={item}
-                                    onAddToCartClicked={() => addToCart(item.productId)} />
+                                    showCart ={showCart}
+                                    />
                                 ))}
                             
                         </ProductsList>
                     ))}
-                <Cart
-                    orders={orders}
-                    total={total}
-                    onCheckoutClicked={() => checkout(orders)} />
+                {orderDates && 
+                    <Cart
+                    orders={orderDates}
+                        //total={total}
+                    onCheckoutClicked={() => checkout(orderDates)} />
+                }
             </form>  
            </Dialog>   
 )
@@ -57,6 +73,7 @@ CartDialog.PropTypes = {
     onSubmit: PropTypes.func, // eslint-disable-line react/no-unused-prop-types
     handleSubmit: PropTypes.func, // added by redux-form
     submit: PropTypes.func, // added by redux-form
+    handleToUpdate: PropTypes.func
 }
 
 export default reduxForm({

@@ -353,7 +353,7 @@ export default class Home extends Component {
          
           <Paper className={classes.paper}>
               <Subheader>Products</Subheader>
-              <DatePicker
+              {/* <DatePicker
                 hintText="Start Date"
                 value={this.state.startDate}
               onChange={this.handleStartDateChange}
@@ -364,7 +364,7 @@ export default class Home extends Component {
               value={this.state.endDate}
               onChange={this.handleEndDateChange}
               formatDate={this.formatDate}
-            />
+            /> */}
               <List className={classes.list}>
                 {products &&
                   map(products, (product, id) => (
@@ -379,9 +379,9 @@ export default class Home extends Component {
                     />
                   ))}
               </List>
-            <RaisedButton label="Create Menu" primary={true}
+            {/* <RaisedButton label="Create Menu" primary={true}
               onClick={this.createMenu}      
-            />
+            /> */}
             </Paper>
         
         </div>

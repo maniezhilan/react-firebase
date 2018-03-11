@@ -1,6 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Product from './Product'
+import { ADD_TO_CART } from 'constants'
+
+
 
 const Cart = ({ date, orders, total, onCheckoutClicked }) => {
     const hasOrders = orders.length > 0
@@ -21,7 +24,7 @@ const Cart = ({ date, orders, total, onCheckoutClicked }) => {
         <div>
             <h3>{date}</h3>
             <div>{nodes}</div>
-            <p>Total: &#36;{total}</p>
+            {/* <p>Total: &#36;{total}</p> */}
             <button onClick={onCheckoutClicked}
                 disabled={hasOrders ? '' : 'disabled'}>
                 Checkout

@@ -14,7 +14,13 @@ export const RECOVER_CODE_FORM_NAME = 'recoverCode'
 export const RECOVER_EMAIL_FORM_NAME = 'recoverEmail'
 export const EDIT_PRODUCT_FORM_NAME = 'editProduct'
 export const CREATE_MENU_FORM_NAME = 'createMenu'
-export const ADD_TO_CART_FORM_NAME = 'addToCart'
+export const ADD_TO_CART_FORM_NAME = 'addToCartForm'
+
+export const ADD_TO_CART = 'ADD_TO_CART'
+export const CHECKOUT_REQUEST = 'CHECKOUT_REQUEST'
+export const CHECKOUT_SUCCESS = 'CHECKOUT_SUCCESS'
+export const CHECKOUT_FAILURE = 'CHECKOUT_FAILURE'
+export const RECEIVE_PRODUCTS = 'RECEIVE_PRODUCTS'
 
 export const formNames = {
   account: ACCOUNT_FORM_NAME,
@@ -24,7 +30,7 @@ export const formNames = {
   recoverEmail: RECOVER_EMAIL_FORM_NAME,
   EDIT_PRODUCT_FORM_NAME,
   newMenu:CREATE_MENU_FORM_NAME,
-  addToCart: ADD_TO_CART_FORM_NAME
+  addToCartForm: ADD_TO_CART_FORM_NAME
 }
 
 export const paths = {

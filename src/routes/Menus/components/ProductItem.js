@@ -1,18 +1,31 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Product from './Product'
+import AddToCartButton from './AddToCartButton'
+import { TextField } from 'redux-form-material-ui'
 
-const ProductItem = ({ product, onAddToCartClicked }) => (
+// let qty=0;
+// let id=''
+// function UpdateCount(event){
+//     qty = event.target.value
+//     console.log(qty,'---',event.target.id)
+//     id = event.target.id
+//     return event.target.value
+// }
+
+
+
+const ProductItem = ({ product, handleToUpdate}) => (
     <div style={{ marginBottom: 20 }}>
         <Product
             title={product.name}
             price={product.price}
-            quantity={product.quantity} />
-        <button
-            onClick={onAddToCartClicked}
-            disabled={product.quantity > 0 ? '' : 'disabled'}>
-            {product.quantity > 0 ? 'Add to cart' : 'Sold Out'}
-        </button>
+            quantity={product.quantity} 
+            />
+        {product.quantity > 0 ? <AddToCartButton qty={UpdateCount} product={product}
+            type="button"
+             /> : 'Sold Out'
+        }
     </div>
 )
 
@@ -22,7 +35,8 @@ ProductItem.propTypes = {
         //price: PropTypes.number.isRequired,
         quantity: PropTypes.number.isRequired
     }).isRequired,
-    onAddToCartClicked: PropTypes.func.isRequired
+    //onAddToCartClicked: PropTypes.func.isRequired
+    handleToUpdate: PropTypes.func.isRequired
 }
 
 export default ProductItem

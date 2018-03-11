@@ -10,7 +10,7 @@ import {
   isLoaded,
   isEmpty
 } from 'react-redux-firebase'
-import { MENU_PATH } from 'constants'
+import { MENU_PATH, ADD_TO_CART, CHECKOUT_REQUEST, CHECKOUT_FAILURE } from 'constants'
 import LoadingSpinner from 'components/LoadingSpinner'
 import { List, ListItem } from 'material-ui/List'
 import Paper from 'material-ui/Paper'
@@ -31,6 +31,8 @@ import Delete from 'material-ui/svg-icons/action/delete'
 import FlatButton from 'material-ui/FlatButton';
 import SvgIconAddShoppingCart from "material-ui/svg-icons/action/add-shopping-cart";
 import CartDialog from "../components/CartDIalog"
+
+
 
 const styles = {
   root: {
@@ -73,12 +75,15 @@ export default class Menus extends Component {
       date: Object.assign({}, this.props.date),
       dailyMenus: [{ productId:'',name: '', quantity: 0, searchText: ''}],
       dailyOrders: [{ productId: '', name: '', quantity: 0}],
-      orderDates: [],
+      orderDates: Object.assign([], this.props.orderDates),
       showMenuForm: false,
       selectedProducts: Object.assign([], this.props.selectedProducts),
       open: false,
       edit: false,
-      openCart: false
+      openCart: false,
+      addedIds: [],
+      quantityById: {},
+      count:0
 
     }
     this.handleRemoveDailyMenu = this.handleRemoveDailyMenu.bind(this)
@@ -122,6 +127,22 @@ export default class Menus extends Component {
       open: false,
     });
   };
+
+  increment =() => {
+    console.log('--increment---',this.state.count)
+    this.setState({
+      count: this.state.count +1 
+    })
+  }
+
+  decrement = () => {
+    console.log('--decrement---', this.state.count)
+    if (this.state.count !== 0) {
+      this.setState({
+        count: this.state.count - 1
+      })
+    }
+  }
 
   //https://stackoverflow.com/questions/3552461/how-to-format-a-javascript-date
   formatDate = (date) => {
@@ -262,21 +283,21 @@ export default class Menus extends Component {
     
   }
 //TODO: Add default units of measure in products
-  addToCart = (date,item,qty) => {
-    const newDailyOrders = this.state.dailyOrders.map((dailyOrder, sidx) => {
-      //if (idx !== sidx) return dailyOrder;
-      return { ...dailyOrder, productId: item.productId, name: item.name, quantity: qty };
-    });
+  // addToCart = (date,item,qty) => {
+  //   const newDailyOrders = this.state.dailyOrders.map((dailyOrder, sidx) => {
+  //     //if (idx !== sidx) return dailyOrder;
+  //     return { ...dailyOrder, productId: item.productId, name: item.name, quantity: qty };
+  //   });
     
-    this.setState({ dailyOrders: newDailyOrders });
-    this.state.orders = this.state.dailyOrders
-    console.log(this.state.orders) 
-    return this.props.firebase.set(`/orders/${this.props.account.username}/${date}`, this.state.orders).catch(err => {
-      console.error('Error Creating daily menu: ', err) // eslint-disable-line no-console
-      this.setState({ error: 'Error Creating daily menu' })
-      return Promise.reject(err)
-    })
-  }
+  //   this.setState({ dailyOrders: newDailyOrders });
+  //   this.state.orders = this.state.dailyOrders
+  //   console.log(this.state.orders) 
+  //   return this.props.firebase.set(`/orders/${this.props.account.username}/${date}`, this.state.orders).catch(err => {
+  //     console.error('Error Creating daily menu: ', err) // eslint-disable-line no-console
+  //     this.setState({ error: 'Error Creating daily menu' })
+  //     return Promise.reject(err)
+  //   })
+  // }
 
   openCart = () => {
     this.setState({ openCart: !this.state.openCart }) 
@@ -287,10 +308,65 @@ export default class Menus extends Component {
     console.log('closeCart----', this.state.openCart)
   }
 
+  addedIds = (productId) => {
+    return [...this.state.addedIds, productId]
+  }
+
+  quantityById = (productId) => {
+    return {
+      ...this.state.quantityById,
+      [productId]: (this.state.quantityById[productId] || 0) + 1
+    }
+
+  }
+
+  getQuantity = (productId) =>
+    this.state.quantityById[productId] || 0
+
+
+  getAddedIds = () => this.state.addedIds
+
+  saveCart = (date, item) => {
+    console.log(date, '--', item);
+  }
+
+  addToCart = (date,item) => {
+    console.log(date,'--',item);
+    //this.setState({ addedIds: [...this.state.addedIds, item.productId]})
+   
+
+    //this.setState({ quantityById: quantityById})
+
+    //TODO: 
+    //1.create date array
+    // if(date in this.state.orderDates){
+    //   this.setState({ dailyOrders: [...this.state.dailyOrders, { productId: item.productId, name: item.name, quantity: 1}]})
+    //   this.state.orderDates[date] = this.state.dailyOrders
+    //   console.log('1----', this.state.orderDates)
+    // }else{
+    //   const newDailyOrders = this.state.dailyOrders.map((dailyOrder, sidx) => {
+    //     return { ...dailyOrder, productId: item.productId, name: item.name, quantity: 1 };
+    //   });
+    //   this.state.orderDates.push(date)
+    //   this.state.orderDates[date] = newDailyOrders
+    //   console.log('2----', this.state.orderDates)
+    // }
+      
+    //2.check if date exists, then add items to array
+    //3.Remove product from Menu
+    //4.assign this array to user
+    //5.save in firebase 
+  
+    
+  }
+
+
+
+  
   render() {
     
-    const { menus, auth, account, products, orders } = this.props
-    const { showMenuForm, searchText, dailyMenus, open, edit, date, openCart, onRequestCloseMenu } = this.state
+    const { menus, auth, account, products, orders, handleSubmit } = this.props
+    const { showMenuForm, searchText, dailyMenus, open, edit, date, openCart, onRequestCloseMenu, orderDates, count } = this.state
     
     // Menu Route is being loaded
     if (this.props.children) {
@@ -388,7 +464,7 @@ export default class Menus extends Component {
                 onRequestClose={this.handleRequestClose}
               />
             }  
-            {account && account.rolename === 'admin' &&  !this.state.edit &&
+            {account && account.rolename === 'admin' &&  !edit &&
             <RaisedButton label="Create Menu" primary={true}
             onClick={this.createMenu}/>
             } 
@@ -433,8 +509,12 @@ export default class Menus extends Component {
             open = {openCart}
             onRequestCloseMenu={this.onRequestCloseMenu}
             menus={menus}
-            handleSubmit=""
-            orders={orders}
+            onSubmit={handleSubmit}
+            orderDates={orderDates}
+            addToCart={this.addToCart}
+            // count={count}
+            // increment={this.increment}
+            // decrement={this.decrement}
             />
           }  
          
