@@ -11,8 +11,8 @@ import ProductsList from './ProductsList'
 import ProductItemClass from './ProductItemClass'
 
 let orderDates = []
-function showCart(params) {
-    console.log('showcart--',params)
+function showCart(date,params) {
+    console.log('showcart--',date,params)
 
 }
 

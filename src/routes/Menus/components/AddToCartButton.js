@@ -85,6 +85,7 @@ export default class AddToCartButton extends Component {
                     <IconButton data-date={date} name={this.state.name} value={count} id={this.state.id} onClick={this.props.qty} disabled={(count === 0 || count > product.quantity)}>
                         <SvgIconAddShoppingCart/>
                     </IconButton>
+                //<button type="button" data-date={date} name={this.state.name} value={count} id={this.state.id} onClick={this.props.qty} disabled={(count == 0 || count > product.quantity)}>Add to cart</button>
                 }
             </div>
         )

@@ -6,7 +6,6 @@ const ProductsList = ({ name, children, showCart }) => (
     <div>
         <h3>{name}</h3>
         <div>{children}</div>
-        --{showCart}
     </div>
 )
 
