@@ -38,7 +38,6 @@ export default class ProductItemClass extends Component {
             this.setState({
                  dailyOrders: newDailyOrders
              })
-        this.props.showCart = this.state.dailyOrders
     }
 
     render() {
