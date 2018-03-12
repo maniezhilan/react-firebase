@@ -2,29 +2,31 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Product from './Product'
 import { ADD_TO_CART } from 'constants'
+import { map } from 'lodash'
 
 
-
-const Cart = ({ date, orders, total, onCheckoutClicked }) => {
-    const hasOrders = orders.length > 0
+const Cart = ({ date, orderDates, total, onCheckoutClicked }) => {
+    const hasOrders = orderDates.length > 0
     const nodes = hasOrders ? (
-        orders.map(order =>
+        orderDates.map(product =>
+            map(product, (item, id) => ( 
             <Product
-                title={order.name}
-                //price={product.price}
-                quantity={order.quantity}
-                key={order.productId}
+                    title={product[item].name}
+                    //price={product.price}
+                    quantity={product[item].quantity}
+                    key={product[item].productId}
             />
+            ))
         )
     ) : (
-            <em>Please add some products to cart.</em>
+            <em></em>
         )
 
     return (
         <div>
-            <h3>{date}</h3>
+            
             <div>{nodes}</div>
-            {/* <p>Total: &#36;{total}</p> */}
+            
             <button onClick={onCheckoutClicked}
                 disabled={hasOrders ? '' : 'disabled'}>
                 Checkout
@@ -34,7 +36,7 @@ const Cart = ({ date, orders, total, onCheckoutClicked }) => {
 }
 
 Cart.propTypes = {
-    orders: PropTypes.array,
+    orders: PropTypes.object,
     total: PropTypes.string,
     onCheckoutClicked: PropTypes.func
 }

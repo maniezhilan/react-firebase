@@ -90,7 +90,7 @@ export default class Menus extends Component {
     this.handleDailyMenuNameChange = this.handleDailyMenuNameChange.bind(this)
     this.saveMenu = this.saveMenu.bind(this)
     this.editMenu = this.editMenu.bind(this)
-    this.addToCart = this.addToCart.bind(this)
+    this.showCart = this.showCart.bind(this)
     this.openCart = this.openCart.bind(this)
     this.onRequestCloseMenu = this.onRequestCloseMenu.bind(this)
   }
@@ -128,21 +128,6 @@ export default class Menus extends Component {
     });
   };
 
-  increment =() => {
-    console.log('--increment---',this.state.count)
-    this.setState({
-      count: this.state.count +1 
-    })
-  }
-
-  decrement = () => {
-    console.log('--decrement---', this.state.count)
-    if (this.state.count !== 0) {
-      this.setState({
-        count: this.state.count - 1
-      })
-    }
-  }
 
   //https://stackoverflow.com/questions/3552461/how-to-format-a-javascript-date
   formatDate = (date) => {
@@ -282,92 +267,35 @@ export default class Menus extends Component {
     })
     
   }
-//TODO: Add default units of measure in products
-  // addToCart = (date,item,qty) => {
-  //   const newDailyOrders = this.state.dailyOrders.map((dailyOrder, sidx) => {
-  //     //if (idx !== sidx) return dailyOrder;
-  //     return { ...dailyOrder, productId: item.productId, name: item.name, quantity: qty };
-  //   });
+
+
+showCart = (date, params) => {
+    //console.log('showcart--', this.state.orderDates)
+    let dates=[]
+    dates.push(date)
+    dates[date]=params
     
-  //   this.setState({ dailyOrders: newDailyOrders });
-  //   this.state.orders = this.state.dailyOrders
-  //   console.log(this.state.orders) 
-  //   return this.props.firebase.set(`/orders/${this.props.account.username}/${date}`, this.state.orders).catch(err => {
-  //     console.error('Error Creating daily menu: ', err) // eslint-disable-line no-console
-  //     this.setState({ error: 'Error Creating daily menu' })
-  //     return Promise.reject(err)
-  //   })
-  // }
+    this.setState(prevState => ({
+      orderDates: [...prevState.orderDates, dates]
+    }))
+  
+    
+}
 
   openCart = () => {
     this.setState({ openCart: !this.state.openCart }) 
-    console.log('openCart----',this.state.openCart)
   }
   onRequestCloseMenu = () => {
     this.setState({ openCart: !this.state.openCart }) 
-    console.log('closeCart----', this.state.openCart)
   }
 
-  addedIds = (productId) => {
-    return [...this.state.addedIds, productId]
-  }
-
-  quantityById = (productId) => {
-    return {
-      ...this.state.quantityById,
-      [productId]: (this.state.quantityById[productId] || 0) + 1
-    }
-
-  }
-
-  getQuantity = (productId) =>
-    this.state.quantityById[productId] || 0
-
-
-  getAddedIds = () => this.state.addedIds
-
-  saveCart = (date, item) => {
-    console.log(date, '--', item);
-  }
-
-  addToCart = (date,item) => {
-    console.log(date,'--',item);
-    //this.setState({ addedIds: [...this.state.addedIds, item.productId]})
-   
-
-    //this.setState({ quantityById: quantityById})
-
-    //TODO: 
-    //1.create date array
-    // if(date in this.state.orderDates){
-    //   this.setState({ dailyOrders: [...this.state.dailyOrders, { productId: item.productId, name: item.name, quantity: 1}]})
-    //   this.state.orderDates[date] = this.state.dailyOrders
-    //   console.log('1----', this.state.orderDates)
-    // }else{
-    //   const newDailyOrders = this.state.dailyOrders.map((dailyOrder, sidx) => {
-    //     return { ...dailyOrder, productId: item.productId, name: item.name, quantity: 1 };
-    //   });
-    //   this.state.orderDates.push(date)
-    //   this.state.orderDates[date] = newDailyOrders
-    //   console.log('2----', this.state.orderDates)
-    // }
-      
-    //2.check if date exists, then add items to array
-    //3.Remove product from Menu
-    //4.assign this array to user
-    //5.save in firebase 
   
-    
-  }
-
-
 
   
   render() {
     
     const { menus, auth, account, products, orders, handleSubmit } = this.props
     const { showMenuForm, searchText, dailyMenus, open, edit, date, openCart, onRequestCloseMenu, orderDates, count } = this.state
-    
     // Menu Route is being loaded
     if (this.props.children) {
       // pass all props to children routes
@@ -510,8 +438,8 @@ export default class Menus extends Component {
             onRequestCloseMenu={this.onRequestCloseMenu}
             menus={menus}
             onSubmit={handleSubmit}
-            orderDates={orderDates}
-            addToCart={this.addToCart}
+            orderDates={this.state.orderDates}
+            showCart={this.showCart}
             // count={count}
             // increment={this.increment}
             // decrement={this.decrement}

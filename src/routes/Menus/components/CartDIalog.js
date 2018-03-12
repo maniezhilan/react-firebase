@@ -10,11 +10,7 @@ import Cart from './Cart'
 import ProductsList from './ProductsList'
 import ProductItemClass from './ProductItemClass'
 
-let orderDates = []
-function showCart(date,params) {
-    console.log('showcart--',date,params)
 
-}
 
 export const CartDialog = ({
     open,
@@ -28,7 +24,7 @@ export const CartDialog = ({
     count,
     increment,
     decrement,
-    //showCart
+    showCart
 }) => (
     <Dialog
         //autoDetectWindowHeight={true}
@@ -58,10 +54,16 @@ export const CartDialog = ({
                         </ProductsList>
                     ))}
                 {orderDates && 
+                //orderDates.map((orders, date) => (     
+                   //map(orders, (item, id) => ( 
                     <Cart
-                    orders={orderDates}
+                    orderDates={orderDates}
                         //total={total}
-                    onCheckoutClicked={() => checkout(orderDates)} />
+                        //date={date}
+                    onCheckoutClicked={() => checkout(orderDates)}
+                          /> 
+                    // ))
+                   // ))
                 }
             </form>  
            </Dialog>   

@@ -35,11 +35,11 @@ export default class ProductItemClass extends Component {
             // this.setState(prevState => ({
             //     orderDates: [...prevState.orderDates, date]
             // }))
-        let newDailyOrders = { productId: event.currentTarget.id, name: event.currentTarget.name, quantity: event.currentTarget.value }
+        let newDailyOrders = { productId: event.currentTarget.id, name: event.currentTarget.name, quantity: parseInt(event.currentTarget.value) }
             // this.setState({
             //      dailyOrders: newDailyOrders
             //  })
-        console.log(date, newDailyOrders)
+        //console.log(date, newDailyOrders)
         this.props.showCart(date,newDailyOrders)     
     }
 

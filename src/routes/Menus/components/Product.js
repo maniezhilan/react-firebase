@@ -8,7 +8,7 @@ const Product = ({ price, quantity, title}) => {
  
    return ( 
         <div>
-           {title} 
+           {title} {quantity}
            
         </div>
    )
