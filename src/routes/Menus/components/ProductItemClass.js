@@ -13,10 +13,10 @@ export default class ProductItemClass extends Component {
     }
     constructor(props, context) {
         super(props, context)
-        this.state = {
-            dailyOrders: [{ productId: '', name: '', quantity: 0 }],
-            orderDates: []
-        }
+        // this.state = {
+        //     dailyOrders: [{ productId: '', name: '', quantity: 0 }],
+        //     orderDates: []
+        // }
     }
 
     static propTypes = {
@@ -40,7 +40,8 @@ export default class ProductItemClass extends Component {
             //      dailyOrders: newDailyOrders
             //  })
         //console.log(date, newDailyOrders)
-        this.props.showCart(date,newDailyOrders)     
+        this.props.showCart(date,newDailyOrders) 
+        //this.props.forceUpdate()    
     }
 
     render() {

@@ -11,10 +11,10 @@ const Cart = ({ date, orderDates, total, onCheckoutClicked }) => {
         orderDates.map(product =>
             map(product, (item, id) => ( 
             <Product
-                    title={product[item].name}
+                    title={item.name}
                     //price={product.price}
-                    quantity={product[item].quantity}
-                    key={product[item].productId}
+                    quantity={item.quantity}
+                    key={item.productId}
             />
             ))
         )

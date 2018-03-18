@@ -19,7 +19,8 @@ export default class AddToCartButton extends Component {
             count: 0,
             id:'',
             name:'',
-            date:''
+            date:'',
+            //inputValue:''
         }
     }
 
@@ -63,6 +64,10 @@ export default class AddToCartButton extends Component {
         })
     }
 
+    handleChange = (e) => {
+        this.setState({ count: e.target.value });
+    }
+
 
     render() {
         const { count } = this.state
@@ -71,21 +76,25 @@ export default class AddToCartButton extends Component {
         return (
             <div className="counter">
                 {
+                    <IconButton secondary={true} mini={true} onClick={this.decrementCount} disabled={(count <= 0)}>
+                        <SvgIconRemoveCircle />
+                    </IconButton>
+                }
+                
+                {/* <input type="number" id={this.state.id} data-date={date} name={this.state.name} value={count} onChange={this.handleChange} onBlur={this.props.qty} /> */}
+                {count}
+             
+                
+                {
                     <IconButton secondary={true} mini={true} onClick={this.incrementCount} disabled={(count >= product.quantity)}>
                         <SvgIconAddCircle />
                     </IconButton>
                 }
-                <span> {count} </span>
-                {
-                    <IconButton secondary={true} mini={true} onClick={this.decrementCount} disabled={(count <= 0)}>
-                        <SvgIconRemoveCircle/>
-                    </IconButton>
-                }
+
                 {
                     <IconButton data-date={date} name={this.state.name} value={count} id={this.state.id} onClick={this.props.qty} disabled={(count === 0 || count > product.quantity)}>
-                        <SvgIconAddShoppingCart/>
+                        <SvgIconAddShoppingCart />
                     </IconButton>
-                //<button type="button" data-date={date} name={this.state.name} value={count} id={this.state.id} onClick={this.props.qty} disabled={(count == 0 || count > product.quantity)}>Add to cart</button>
                 }
             </div>
         )

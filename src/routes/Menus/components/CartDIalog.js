@@ -15,7 +15,6 @@ import ProductItemClass from './ProductItemClass'
 export const CartDialog = ({
     open,
     onRequestCloseMenu,
-    handleSubmit,
     onSubmit,
     menus,
     orderDates,
@@ -24,7 +23,9 @@ export const CartDialog = ({
     count,
     increment,
     decrement,
-    showCart
+    showCart,
+    forceUpdate,
+    submit
 }) => (
     <Dialog
         //autoDetectWindowHeight={true}
@@ -34,7 +35,7 @@ export const CartDialog = ({
         contentClassName={classes.container}
             actions={[
                 <FlatButton label="Cancel" secondary onTouchTap={onRequestCloseMenu} />,
-                <FlatButton label="Submit" primary onTouchTap={onSubmit} />
+                <FlatButton label="Submit" primary onTouchTap={submit} />
             ]}>
             <form onSubmit={onSubmit} className={classes.inputs}>
             
@@ -48,6 +49,7 @@ export const CartDialog = ({
                                     date={date}
                                     product={item}
                                     showCart ={showCart}
+                                    //forceUpdate={forceUpdate}
                                     />
                                 ))}
                             
@@ -61,6 +63,8 @@ export const CartDialog = ({
                         //total={total}
                         //date={date}
                     onCheckoutClicked={() => checkout(orderDates)}
+
+                    
                           /> 
                     // ))
                    // ))

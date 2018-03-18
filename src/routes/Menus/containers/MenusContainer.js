@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import PropTypes from 'prop-types'
+import PropTypes, { bool } from 'prop-types'
 import { map, get } from 'lodash'
 import { connect } from 'react-redux'
 import {
@@ -75,7 +75,7 @@ export default class Menus extends Component {
       date: Object.assign({}, this.props.date),
       dailyMenus: [{ productId:'',name: '', quantity: 0, searchText: ''}],
       dailyOrders: [{ productId: '', name: '', quantity: 0}],
-      orderDates: Object.assign([], this.props.orderDates),
+      orderDates: [],
       showMenuForm: false,
       selectedProducts: Object.assign([], this.props.selectedProducts),
       open: false,
@@ -93,6 +93,7 @@ export default class Menus extends Component {
     this.showCart = this.showCart.bind(this)
     this.openCart = this.openCart.bind(this)
     this.onRequestCloseMenu = this.onRequestCloseMenu.bind(this)
+    this.forceUpdateHandler = this.forceUpdateHandler.bind(this);
   }
 
   static propTypes = {
@@ -115,6 +116,10 @@ export default class Menus extends Component {
       email: PropTypes.string
     })
   }
+
+  forceUpdateHandler() {
+    this.forceUpdate();
+  };
 
   handleClick = () => {
     this.setState({
@@ -268,18 +273,97 @@ export default class Menus extends Component {
     
   }
 
+ checkVal = (obj,date) => {
+   //for (const k in obj) {
+     console.log(obj, '--checkval--', date)
+     if (obj.hasOwnProperty(date)) {
+       return true;
+     }
+   //}
+  
+ }
+ 
+ hasKeySetTo = (obj, key, value) => {
+   console.log("obj---",obj)
+   //for(let [i,val] of obj.entries()){
+    //console.log('hasKeySetTo ---',i,val[key]) 
+   return obj.hasOwnProperty(key) && obj[key] === value;
+   //}
+}
+
+
+// Adding new item to already existing date 
+addNewItemToExistingDate = (dates,date,params) => {
+  if(dates.hasOwnProperty(date)){
+  for (const k in dates) {
+    if (k === date){
+          console.log('Before:: Adding new item to already existing date ', dates[k])
+          console.log('After:: Adding new item to already existing date ', dates[k].concat(params))
+          this.state.orderDates[date] = dates[k].concat(params)
+          console.log('--newOrderDates--', this.state.orderDates)
+      }
+    }
+  }
+}
+
+//If the user updates the quantity
+updateQuantity = (dates,date,params) => {
+    for (const k in dates) {
+      console.log(' dates[k].entries()', dates[k])
+      if (k === date){
+        for(let [i,item] of dates[k].entries()){
+          if (k === date && this.hasKeySetTo(item, 'productId', params.productId)) {
+            console.log("key exits update ---", dates[date]);
+            dates[k][i].quantity = params.quantity
+            console.log(" updated order ",dates[k][i]);
+            this.state.orderDates[date] = dates[k][i]
+            return
+          }
+        }
+      }
+    }
+   
+}
+
+
+  addToDailyOrders = (dates, date, params) => {
+    this.updateQuantity(dates,date,params)
+    //console.log('key does not exist')
+    //this.addNewItemToExistingDate(dates, date, params)
+}
 
 showCart = (date, params) => {
-    //console.log('showcart--', this.state.orderDates)
-    let dates=[]
-    dates.push(date)
-    dates[date]=params
-    
-    this.setState(prevState => ({
-      orderDates: [...prevState.orderDates, dates]
-    }))
   
+  let dates = this.state.orderDates
+  console.log('dates', this.state.orderDates);
+  if (this.checkVal(dates,date)) {
+    console.log('update--checkval');
+    this.addToDailyOrders(dates,date,params)
     
+    }else{
+  //if(!this.checkVal(dates, date)){
+      let newOrder = {}
+       newOrder[date]=[params]
+       console.log('new Date coming thro--',newOrder)
+       
+    this.setState({
+      orderDates: Object.assign(this.state.orderDates, newOrder)
+    })
+
+    console.log('--orders--', this.state.orderDates)
+   }
+  
+  
+}
+
+saveOrders=() => {
+  const { account} = this.props
+  console.log('--save--', this.state.orderDates)
+  return this.props.firebase.set(`/orders/${account.username}`, this.state.orderDates).catch(err => {
+    console.error('Error Creating weekly order: ', err) // eslint-disable-line no-console
+    this.setState({ error: 'Error Creating weekly order' })
+    return Promise.reject(err)
+  })
 }
 
   openCart = () => {
@@ -437,9 +521,10 @@ showCart = (date, params) => {
             open = {openCart}
             onRequestCloseMenu={this.onRequestCloseMenu}
             menus={menus}
-            onSubmit={handleSubmit}
+            onSubmit={this.saveOrders}
             orderDates={this.state.orderDates}
             showCart={this.showCart}
+            //forceUpdate={this.forceUpdateHandler}
             // count={count}
             // increment={this.increment}
             // decrement={this.decrement}
