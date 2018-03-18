@@ -1,14 +1,13 @@
 import React, { Component } from 'react'
 import PropTypes, { bool } from 'prop-types'
-import { map, get } from 'lodash'
+import { map, get, isEmpty } from 'lodash'
 import { connect } from 'react-redux'
 import {
   firebaseConnect,
   populatedDataToJS,
   pathToJS,
   dataToJS,
-  isLoaded,
-  isEmpty
+  isLoaded
 } from 'react-redux-firebase'
 import { MENU_PATH, ADD_TO_CART, CHECKOUT_REQUEST, CHECKOUT_FAILURE } from 'constants'
 import LoadingSpinner from 'components/LoadingSpinner'
@@ -283,12 +282,21 @@ export default class Menus extends Component {
   
  }
  
- hasKeySetTo = (obj, key, value) => {
+ hasKeySetTo = (obj, itemKey, value) => {
    console.log("obj---",obj)
-   //for(let [i,val] of obj.entries()){
-    //console.log('hasKeySetTo ---',i,val[key]) 
-   return obj.hasOwnProperty(key) && obj[key] === value;
-   //}
+   if(obj.length!==undefined){
+    for(let [i,item] of Object.entries(obj)){
+      
+      console.log('hasKeySetTo ---', i, item, item.productId, ' === ', value, item.productId === value) 
+      if (item.productId === value){
+        return true;
+        break
+      }
+      return false
+    }
+  }else{
+     return obj.hasOwnProperty('productId') && obj.productId === value
+  }
 }
 
 
@@ -296,7 +304,7 @@ export default class Menus extends Component {
 addNewItemToExistingDate = (dates,date,params) => {
   if(dates.hasOwnProperty(date)){
   for (const k in dates) {
-    if (k === date){
+    if (k === date && !this.hasKeySetTo(dates[k], 'productId', params.productId)){
           console.log('Before:: Adding new item to already existing date ', dates[k])
           console.log('After:: Adding new item to already existing date ', dates[k].concat(params))
           this.state.orderDates[date] = dates[k].concat(params)
@@ -309,17 +317,26 @@ addNewItemToExistingDate = (dates,date,params) => {
 //If the user updates the quantity
 updateQuantity = (dates,date,params) => {
     for (const k in dates) {
-      console.log(' dates[k].entries()', dates[k])
-      if (k === date){
+      
+      if (k === date && !isEmpty(dates[k])){
+        //check if key exists if not exit
+        console.log("check if key exists if not exit ---",dates[k]);
+        if (!this.hasKeySetTo(dates[k], 'productId', params.productId)) {
+          //this.addNewItemToExistingDate(dates[k],date,params)
+          console.log('break--------------')
+          break
+        }else{
         for(let [i,item] of dates[k].entries()){
-          if (k === date && this.hasKeySetTo(item, 'productId', params.productId)) {
-            console.log("key exits update ---", dates[date]);
-            dates[k][i].quantity = params.quantity
-            console.log(" updated order ",dates[k][i]);
-            this.state.orderDates[date] = dates[k][i]
+          console.log('item--',item, ' dates[k][i]', dates[k][i])
+          if (this.hasKeySetTo(item, 'productId', params.productId)) {
+            item.quantity = params.quantity
+            console.log(" updated order ",item);
+            console.log(" update ",this.state.orderDates[date][i])
+            this.state.orderDates[date][i] = item
             return
           }
         }
+      }
       }
     }
    
@@ -329,7 +346,8 @@ updateQuantity = (dates,date,params) => {
   addToDailyOrders = (dates, date, params) => {
     this.updateQuantity(dates,date,params)
     //console.log('key does not exist')
-    //this.addNewItemToExistingDate(dates, date, params)
+    //TODO: only either one of them work, combination is not working yet 
+    this.addNewItemToExistingDate(dates, date, params)
 }
 
 showCart = (date, params) => {
