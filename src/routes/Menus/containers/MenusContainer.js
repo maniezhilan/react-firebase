@@ -82,7 +82,8 @@ export default class Menus extends Component {
       openCart: false,
       addedIds: [],
       quantityById: {},
-      count:0
+      count:0,
+      item: [{ productId: '', name: '', quantity: 0 }]
 
     }
     this.handleRemoveDailyMenu = this.handleRemoveDailyMenu.bind(this)
@@ -117,6 +118,7 @@ export default class Menus extends Component {
   }
 
   forceUpdateHandler() {
+    this.setState({orderDates: this.state.orderDates})
     this.forceUpdate();
   };
 
@@ -305,10 +307,11 @@ addNewItemToExistingDate = (dates,date,params) => {
   if(dates.hasOwnProperty(date)){
   for (const k in dates) {
     if (k === date && !this.hasKeySetTo(dates[k], 'productId', params.productId)){
-          console.log('Before:: Adding new item to already existing date ', dates[k])
-          console.log('After:: Adding new item to already existing date ', dates[k].concat(params))
+          //console.log('Before:: Adding new item to already existing date ', dates[k])
+          //console.log('After:: Adding new item to already existing date ', dates[k].concat(params))
           this.state.orderDates[date] = dates[k].concat(params)
-          console.log('--newOrderDates--', this.state.orderDates)
+          //console.log('--newOrderDates--', this.state.orderDates)
+          this.setState({orderDates: this.state.orderDates})
       }
     }
   }
@@ -320,19 +323,22 @@ updateQuantity = (dates,date,params) => {
       
       if (k === date && !isEmpty(dates[k])){
         //check if key exists if not exit
-        console.log("check if key exists if not exit ---",dates[k]);
+        //console.log("check if key exists if not exit ---",dates[k]);
         if (!this.hasKeySetTo(dates[k], 'productId', params.productId)) {
           //this.addNewItemToExistingDate(dates[k],date,params)
-          console.log('break--------------')
+         // console.log('break--------------')
           break
         }else{
         for(let [i,item] of dates[k].entries()){
-          console.log('item--',item, ' dates[k][i]', dates[k][i])
+          //console.log('item--',item, ' dates[k][i]', dates[k][i])
           if (this.hasKeySetTo(item, 'productId', params.productId)) {
             item.quantity = params.quantity
-            console.log(" updated order ",item);
-            console.log(" update ",this.state.orderDates[date][i])
+            //console.log(" updated order ",item);
+            //console.log(" update ",this.state.orderDates[date][i])
             this.state.orderDates[date][i] = item
+            this.setState({
+              orderDates: this.state.orderDates
+            })
             return
           }
         }
@@ -351,27 +357,22 @@ updateQuantity = (dates,date,params) => {
 }
 
 showCart = (date, params) => {
-  
   let dates = this.state.orderDates
-  console.log('dates', this.state.orderDates);
   if (this.checkVal(dates,date)) {
-    console.log('update--checkval');
     this.addToDailyOrders(dates,date,params)
-    
     }else{
-  //if(!this.checkVal(dates, date)){
       let newOrder = {}
        newOrder[date]=[params]
-       console.log('new Date coming thro--',newOrder)
-       
-    this.setState({
-      orderDates: Object.assign(this.state.orderDates, newOrder)
-    })
+      this.setState({
+        orderDates: Object.assign(this.state.orderDates, newOrder)
+      })
+      console.log('--orders--', this.state.orderDates)
+  }
+  this.setState({orderDates:this.state.orderDates})
+}
 
-    console.log('--orders--', this.state.orderDates)
-   }
-  
-  
+showCartContent = (date, params) => {
+  this.setState({ count: this.state.count + params.quantity})
 }
 
 saveOrders=() => {
@@ -397,8 +398,10 @@ saveOrders=() => {
   render() {
     
     const { menus, auth, account, products, orders, handleSubmit } = this.props
-    const { showMenuForm, searchText, dailyMenus, open, edit, date, openCart, onRequestCloseMenu, orderDates, count } = this.state
+    const { showMenuForm, searchText, dailyMenus, open, edit, date, item, openCart, onRequestCloseMenu, orderDates, count } = this.state
     // Menu Route is being loaded
+    
+   
     if (this.props.children) {
       // pass all props to children routes
       return React.cloneElement(this.props.children, this.props)
@@ -540,14 +543,18 @@ saveOrders=() => {
             onRequestCloseMenu={this.onRequestCloseMenu}
             menus={menus}
             onSubmit={this.saveOrders}
-            orderDates={this.state.orderDates}
+            orderDates={this.state.dailyOrders}
             showCart={this.showCart}
-            //forceUpdate={this.forceUpdateHandler}
+            forceUpdate={this.forceUpdateHandler}
+            cartCount={count}
+            showCartContent={this.showCartContent}
             // count={count}
             // increment={this.increment}
             // decrement={this.decrement}
             />
+            
           }  
+          
          
         </div>
       </div>

@@ -2,14 +2,14 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Dialog from 'material-ui/Dialog'
 import FlatButton from 'material-ui/FlatButton'
+import RaisedButton from 'material-ui/RaisedButton';
 import { Field, reduxForm } from 'redux-form'
 import { map } from 'lodash'
 import classes from './CartDialog.scss'
 import { ADD_TO_CART_FORM_NAME } from 'constants'
-import Cart from './Cart'
+import CartClass from './CartClass'
 import ProductsList from './ProductsList'
 import ProductItemClass from './ProductItemClass'
-
 
 
 export const CartDialog = ({
@@ -25,7 +25,9 @@ export const CartDialog = ({
     decrement,
     showCart,
     forceUpdate,
-    submit
+    submit,
+    cartCount,
+    showCartContent
 }) => (
     <Dialog
         //autoDetectWindowHeight={true}
@@ -35,7 +37,7 @@ export const CartDialog = ({
         contentClassName={classes.container}
             actions={[
                 <FlatButton label="Cancel" secondary onTouchTap={onRequestCloseMenu} />,
-                <FlatButton label="Submit" primary onTouchTap={submit} />
+                // <RaisedButton label="Checkout" primary={true} onTouchTap={submit} />
             ]}>
             <form onSubmit={onSubmit} className={classes.inputs}>
             
@@ -49,26 +51,16 @@ export const CartDialog = ({
                                     date={date}
                                     product={item}
                                     showCart ={showCart}
-                                    //forceUpdate={forceUpdate}
+                                    forceUpdate={forceUpdate}
+                                    showCartContent={showCartContent}
                                     />
                                 ))}
                             
                         </ProductsList>
                     ))}
-                {orderDates && 
-                //orderDates.map((orders, date) => (     
-                   //map(orders, (item, id) => ( 
-                    <Cart
-                    orderDates={orderDates}
-                        //total={total}
-                        //date={date}
-                    onCheckoutClicked={() => checkout(orderDates)}
-
-                    
-                          /> 
-                    // ))
-                   // ))
-                }
+                  <CartClass 
+                    count={cartCount}
+                  />  
             </form>  
            </Dialog>   
 )
