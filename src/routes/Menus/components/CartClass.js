@@ -4,6 +4,7 @@ import Product from './Product'
 import { ADD_TO_CART } from 'constants'
 import { map } from 'lodash'
 import RaisedButton from 'material-ui/RaisedButton';
+import CheckoutDialog from "../components/CheckoutDialog"
 
 export default class CartClass extends Component {
     static contextTypes = {
@@ -11,57 +12,40 @@ export default class CartClass extends Component {
     }
     constructor(props, context) {
         super(props, context)
+        this.state = {
+            openCart: false
+        }
     }
 
+
+    openCart = () => {
+        this.setState({ openCart: !this.state.openCart })
+    }
+    onRequestCloseMenu = () => {
+        this.setState({ openCart: !this.state.openCart })
+    }
 
     
 
     render() {
-        const { count } = this.props
+        const { count,orderDates } = this.props
+        console.log(orderDates)
+        const { openCart} = this.state
         return (
             <div className="counter">
                {/* <button type="button" >View cart: {count}</button> */}
-                <RaisedButton secondary label={`View cart: ${count}`} primary={true}/>
+                <RaisedButton secondary label={`View cart: ${count}`} primary={true} onTouchTap={this.openCart}/>
+
+                {openCart && 
+                    <CheckoutDialog
+                    open={openCart}
+                    onRequestCloseMenu={this.onRequestCloseMenu}
+                    orderDates={orderDates}
+                    />
+
+                }
             </div>
         )
     }
 }
 
-// const Cart = ({ date, orderDates, total, onCheckoutClicked }) => {
-//     const hasOrders = orderDates.length > 0
-//     const nodes = hasOrders ? (
-//         orderDates.map(product =>
-//             map(product, (item, id) => ( 
-//             // <Product
-//             //     title={product.name}
-//             //         //price={product.price}
-//             //     quantity={product.quantity}
-//             //     key={product.productId}
-//             // />
-//             <span>{item}</span>
-//             ))
-//         )
-//     ) : (
-//             <em></em>
-//         )
-
-//     return (
-//         <div>
-            
-//             <div>{nodes}</div>
-            
-//             <button onClick={onCheckoutClicked}
-//                 disabled={hasOrders ? '' : 'disabled'}>
-//                 Checkout
-//       </button>
-//         </div>
-//     )
-// }
-
-// Cart.propTypes = {
-//     orders: PropTypes.object,
-//     total: PropTypes.string,
-//     onCheckoutClicked: PropTypes.func
-// }
-
-// export default Cart
