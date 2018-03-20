@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "krabby-2017"
+    "default": "krabby-2017",
+    "prod": "krabby-2017"
   }
 }

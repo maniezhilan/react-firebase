@@ -42,6 +42,7 @@ export default class ProductItemClass extends Component {
         //console.log(date, newDailyOrders)
         this.props.showCart(date,newDailyOrders) 
         this.props.showCartContent(date, newDailyOrders)
+        this.props.checkoutCart(date, newDailyOrders)
         //this.props.forceUpdate()    
     }
 

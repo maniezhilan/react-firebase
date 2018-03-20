@@ -11,6 +11,21 @@ import CartClass from './CartClass'
 import ProductsList from './ProductsList'
 import ProductItemClass from './ProductItemClass'
 
+let myCart = new Map();
+
+function checkoutCart(date,item){
+    console.log(date,item)
+    if (myCart.has(date)){
+        let val = myCart.get(date)
+        console.log('val ---', val)  
+        let newVal = val.concat(item)
+        console.log('val concat---', newVal)  
+        myCart.set(date, newVal)  
+        console.log(date,'---print cart ---', myCart.get(date))  
+    }else{
+        myCart.set(date,[item])
+    }
+}
 
 export const CartDialog = ({
     open,
@@ -53,6 +68,7 @@ export const CartDialog = ({
                                     showCart ={showCart}
                                     forceUpdate={forceUpdate}
                                     showCartContent={showCartContent}
+                                    checkoutCart={checkoutCart}
                                     />
                                 ))}
                             
@@ -60,6 +76,7 @@ export const CartDialog = ({
                     ))}
                   <CartClass 
                     count={cartCount}
+                    myCart={myCart}
                   />  
             </form>  
            </Dialog>   

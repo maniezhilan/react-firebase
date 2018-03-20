@@ -15,7 +15,7 @@ export const CheckoutDialog = ({
     open,
     onRequestCloseMenu,
     onSubmit,
-    orderDates,
+    myCart,
     submit,
 }) => (
     <Dialog
@@ -30,7 +30,7 @@ export const CheckoutDialog = ({
             ]}>
             <form onSubmit={onSubmit} className={classes.inputs}>
             
-                {orderDates &&
+                {/* {orderDates &&
                     map(orderDates, (product, date) => (    
                     <ProductsList title="Products" name={date}>
                                 {map(product,(item,id) => (
@@ -41,7 +41,16 @@ export const CheckoutDialog = ({
                                     />
                                 ))}
                         </ProductsList>
-                    ))}
+                    ))} */}
+                {myCart && 
+                    [...myCart].map(([date, items]) => {
+                    return <div key={date} > <h4> {date} </h4> 
+                        {
+                            items.map((object, i) => <div key={i}> {object.name} - {object.quantity}</div>
+                        )}
+                     </div> 
+                    })
+                }  
                   
             </form>  
            </Dialog>   

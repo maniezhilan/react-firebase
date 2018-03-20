@@ -118,6 +118,7 @@ export default class Menus extends Component {
   }
 
   forceUpdateHandler() {
+    console.log('hmmm...')
     this.setState({orderDates: this.state.orderDates})
     this.forceUpdate();
   };
@@ -543,7 +544,7 @@ saveOrders=() => {
             onRequestCloseMenu={this.onRequestCloseMenu}
             menus={menus}
             onSubmit={this.saveOrders}
-            orderDates={this.state.dailyOrders}
+            orderDates={this.state.orderDates}
             showCart={this.showCart}
             forceUpdate={this.forceUpdateHandler}
             cartCount={count}

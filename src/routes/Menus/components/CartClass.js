@@ -13,7 +13,7 @@ export default class CartClass extends Component {
     constructor(props, context) {
         super(props, context)
         this.state = {
-            openCart: false
+            openCart: false,
         }
     }
 
@@ -28,9 +28,8 @@ export default class CartClass extends Component {
     
 
     render() {
-        const { count,orderDates } = this.props
-        console.log(orderDates)
-        const { openCart} = this.state
+        const { count, myCart } = this.props
+        const { openCart } = this.state
         return (
             <div className="counter">
                {/* <button type="button" >View cart: {count}</button> */}
@@ -40,7 +39,7 @@ export default class CartClass extends Component {
                     <CheckoutDialog
                     open={openCart}
                     onRequestCloseMenu={this.onRequestCloseMenu}
-                    orderDates={orderDates}
+                    myCart={myCart}
                     />
 
                 }
