@@ -83,17 +83,16 @@ export default class Menus extends Component {
       addedIds: [],
       quantityById: {},
       count:0,
-      item: [{ productId: '', name: '', quantity: 0 }]
+      item: [{ productId: '', name: '', quantity: 0 }],
+      myCart : new Map()
 
     }
     this.handleRemoveDailyMenu = this.handleRemoveDailyMenu.bind(this)
     this.handleDailyMenuNameChange = this.handleDailyMenuNameChange.bind(this)
     this.saveMenu = this.saveMenu.bind(this)
     this.editMenu = this.editMenu.bind(this)
-    this.showCart = this.showCart.bind(this)
     this.openCart = this.openCart.bind(this)
     this.onRequestCloseMenu = this.onRequestCloseMenu.bind(this)
-    this.forceUpdateHandler = this.forceUpdateHandler.bind(this);
   }
 
   static propTypes = {
@@ -275,102 +274,46 @@ export default class Menus extends Component {
     
   }
 
- checkVal = (obj,date) => {
-   //for (const k in obj) {
-     console.log(obj, '--checkval--', date)
-     if (obj.hasOwnProperty(date)) {
-       return true;
-     }
-   //}
-  
- }
- 
- hasKeySetTo = (obj, itemKey, value) => {
-   console.log("obj---",obj)
-   if(obj.length!==undefined){
-    for(let [i,item] of Object.entries(obj)){
-      
-      console.log('hasKeySetTo ---', i, item, item.productId, ' === ', value, item.productId === value) 
-      if (item.productId === value){
-        return true;
-        break
-      }
-      return false
-    }
-  }else{
-     return obj.hasOwnProperty('productId') && obj.productId === value
-  }
-}
-
-
-// Adding new item to already existing date 
-addNewItemToExistingDate = (dates,date,params) => {
-  if(dates.hasOwnProperty(date)){
-  for (const k in dates) {
-    if (k === date && !this.hasKeySetTo(dates[k], 'productId', params.productId)){
-          //console.log('Before:: Adding new item to already existing date ', dates[k])
-          //console.log('After:: Adding new item to already existing date ', dates[k].concat(params))
-          this.state.orderDates[date] = dates[k].concat(params)
-          //console.log('--newOrderDates--', this.state.orderDates)
-          this.setState({orderDates: this.state.orderDates})
-      }
+keyExists = (orders, key) => {
+  for (let [i, order] of Object.entries(orders)) {
+    if (order.productId === key) {
+      return true
+      break
     }
   }
 }
 
-//If the user updates the quantity
-updateQuantity = (dates,date,params) => {
-    for (const k in dates) {
-      
-      if (k === date && !isEmpty(dates[k])){
-        //check if key exists if not exit
-        //console.log("check if key exists if not exit ---",dates[k]);
-        if (!this.hasKeySetTo(dates[k], 'productId', params.productId)) {
-          //this.addNewItemToExistingDate(dates[k],date,params)
-         // console.log('break--------------')
-          break
-        }else{
-        for(let [i,item] of dates[k].entries()){
-          //console.log('item--',item, ' dates[k][i]', dates[k][i])
-          if (this.hasKeySetTo(item, 'productId', params.productId)) {
-            item.quantity = params.quantity
-            //console.log(" updated order ",item);
-            //console.log(" update ",this.state.orderDates[date][i])
-            this.state.orderDates[date][i] = item
-            this.setState({
-              orderDates: this.state.orderDates
-            })
-            return
-          }
-        }
-      }
+updateOrder = (orders, item) => {
+  for (let [i, order] of Object.entries(orders)) {
+    if (order.productId === item.productId) {
+      order.quantity = item.quantity
+      break
+    }
+  }
+}
+
+checkoutCart = (date, item) => {
+  let myCart = this.state.myCart
+  if (myCart.has(date)) {
+    let orders = myCart.get(date)
+    //check if key exists
+    if (orders.length !== undefined) {
+      if (this.keyExists(orders, item.productId)) {
+        this.updateOrder(orders, item)
+      } else {
+        //Add to existing date
+        let newVal = orders.concat(item)
+        myCart.set(date, newVal)
       }
     }
-   
-}
-
-
-  addToDailyOrders = (dates, date, params) => {
-    this.updateQuantity(dates,date,params)
-    //console.log('key does not exist')
-    //TODO: only either one of them work, combination is not working yet 
-    this.addNewItemToExistingDate(dates, date, params)
-}
-
-showCart = (date, params) => {
-  let dates = this.state.orderDates
-  if (this.checkVal(dates,date)) {
-    this.addToDailyOrders(dates,date,params)
-    }else{
-      let newOrder = {}
-       newOrder[date]=[params]
-      this.setState({
-        orderDates: Object.assign(this.state.orderDates, newOrder)
-      })
-      console.log('--orders--', this.state.orderDates)
+    console.log(date, '---print cart ---', myCart.get(date))
+  } else {
+    myCart.set(date, [item])
   }
-  this.setState({orderDates:this.state.orderDates})
+  this.setState({myCart: myCart})
 }
+
+
 
 showCartContent = (date, params) => {
   this.setState({ count: this.state.count + params.quantity})
@@ -378,12 +321,21 @@ showCartContent = (date, params) => {
 
 saveOrders=() => {
   const { account} = this.props
+  let keys = [...this.state.myCart.keys()];
+  let orders = []
+  keys.forEach(key => {
+    orders[key] = this.state.myCart.get(key)
+  });
+  this.setState({ orderDates: orders })
   console.log('--save--', this.state.orderDates)
-  return this.props.firebase.set(`/orders/${account.username}`, this.state.orderDates).catch(err => {
+  return this.props.firebase.set(`/orders/${account.username}`, orders).catch(err => {
     console.error('Error Creating weekly order: ', err) // eslint-disable-line no-console
     this.setState({ error: 'Error Creating weekly order' })
     return Promise.reject(err)
   })
+  this.setState({ openCart: false }) 
+
+
 }
 
   openCart = () => {
@@ -544,14 +496,10 @@ saveOrders=() => {
             onRequestCloseMenu={this.onRequestCloseMenu}
             menus={menus}
             onSubmit={this.saveOrders}
-            orderDates={this.state.orderDates}
-            showCart={this.showCart}
-            forceUpdate={this.forceUpdateHandler}
+            orderDates={this.state.myCart}
+            showCart={this.checkoutCart}
             cartCount={count}
             showCartContent={this.showCartContent}
-            // count={count}
-            // increment={this.increment}
-            // decrement={this.decrement}
             />
             
           }  

@@ -13,14 +13,38 @@ import ProductItemClass from './ProductItemClass'
 
 let myCart = new Map();
 
+function keyExists(orders,key){
+    for (let [i, order] of Object.entries(orders)) {
+        if (order.productId === key) {
+            return true
+            break
+        }
+    }
+}
+
+function updateOrder(orders,item){
+    for (let [i, order] of Object.entries(orders)) {
+        if (order.productId === item.productId) {
+            order.quantity = item.quantity
+            break
+        }
+    }
+}
+
 function checkoutCart(date,item){
     console.log(date,item)
     if (myCart.has(date)){
-        let val = myCart.get(date)
-        console.log('val ---', val)  
-        let newVal = val.concat(item)
-        console.log('val concat---', newVal)  
-        myCart.set(date, newVal)  
+        let orders = myCart.get(date)
+        //check if key exists
+        if (orders.length !== undefined) {
+            if (keyExists(orders, item.productId)){
+                updateOrder(orders, item)
+            }else{
+            //Add to existing date
+                let newVal = orders.concat(item)
+                myCart.set(date, newVal)  
+            }
+        }
         console.log(date,'---print cart ---', myCart.get(date))  
     }else{
         myCart.set(date,[item])
@@ -33,13 +57,9 @@ export const CartDialog = ({
     onSubmit,
     menus,
     orderDates,
-    total,
     addToCart,
     count,
-    increment,
-    decrement,
     showCart,
-    forceUpdate,
     submit,
     cartCount,
     showCartContent
@@ -58,7 +78,7 @@ export const CartDialog = ({
             
                 {menus &&
                     map(menus, (product, date) => (    
-                    <ProductsList title="Products" name={date}>
+                    <ProductsList title="Products" name={date} key={date}>
                             
                                 {map(product,(item,id) => (
                             <ProductItemClass 
@@ -66,7 +86,6 @@ export const CartDialog = ({
                                     date={date}
                                     product={item}
                                     showCart ={showCart}
-                                    forceUpdate={forceUpdate}
                                     showCartContent={showCartContent}
                                     checkoutCart={checkoutCart}
                                     />

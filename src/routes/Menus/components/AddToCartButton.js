@@ -76,7 +76,7 @@ export default class AddToCartButton extends Component {
         return (
             <div className="counter">
                 {
-                    <IconButton secondary={true} mini={true} onClick={this.decrementCount} disabled={(count <= 0)}>
+                    <IconButton secondary={true} onClick={this.decrementCount} disabled={(count <= 0)}>
                         <SvgIconRemoveCircle />
                     </IconButton>
                 }
@@ -86,7 +86,7 @@ export default class AddToCartButton extends Component {
              
                 
                 {
-                    <IconButton secondary={true} mini={true} onClick={this.incrementCount} disabled={(count >= product.quantity)}>
+                    <IconButton secondary={true}  onClick={this.incrementCount} disabled={(count >= product.quantity)}>
                         <SvgIconAddCircle />
                     </IconButton>
                 }

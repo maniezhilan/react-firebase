@@ -13,10 +13,6 @@ export default class ProductItemClass extends Component {
     }
     constructor(props, context) {
         super(props, context)
-        // this.state = {
-        //     dailyOrders: [{ productId: '', name: '', quantity: 0 }],
-        //     orderDates: []
-        // }
     }
 
     static propTypes = {
