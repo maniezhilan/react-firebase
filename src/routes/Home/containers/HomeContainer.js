@@ -32,7 +32,8 @@ import { pick } from 'lodash'
   // 'todos' // sync full list of todos
   // { path: 'todos', type: 'once' } // for loading once instead of binding
   { path: 'products', queryParams: ['orderByKey', 'limitToLast=5'] }, // 10 most recent
-  { path: 'menus', queryParams: ['orderByKey', 'limitToLast=5'] } // 10 most recent
+  { path: 'menus', queryParams: ['orderByKey', 'limitToLast=5'] }, // 10 most recent
+  { path: 'orders', queryParams: ['orderByKey', 'limitToLast=10'] }
   // { path: 'todos', populates } // populate
   // { path: 'todos', storeAs: 'myTodos' } // store elsewhere in redux
 ])
@@ -41,6 +42,7 @@ import { pick } from 'lodash'
   account: pathToJS(firebase, 'profile'),
   products: dataToJS(firebase, 'products'),
   menus: dataToJS(firebase, 'menus'),
+  orders: dataToJS(firebase, 'orders'),
   
   // todos: orderedToJS(firebase, 'todos') // if looking for array
   // todos: dataToJS(firebase, 'myTodos'), // if using storeAs
@@ -285,14 +287,14 @@ export default class Home extends Component {
   
 
   render() {
-    const { products } = this.props
+    const { products,orders } = this.props
     const { error } = this.state
     const { account} = this.props
     const { editProductModal } = this.state
     const { showMenuModal } = this.state
     const { product } = this.state
     const { selectedProducts } = this.state
-
+    console.log(orders)
     return (
       <div
         className={classes.container}
@@ -351,20 +353,8 @@ export default class Home extends Component {
             <NewProductPanel onNewClick={this.handleAdd} disabled={false} /> 
         }
          
-          <Paper className={classes.paper}>
+          {/* <Paper className={classes.paper}>
               <Subheader>Products</Subheader>
-              {/* <DatePicker
-                hintText="Start Date"
-                value={this.state.startDate}
-              onChange={this.handleStartDateChange}
-              formatDate={this.formatDate}
-              />
-            <DatePicker
-              hintText="End Date"
-              value={this.state.endDate}
-              onChange={this.handleEndDateChange}
-              formatDate={this.formatDate}
-            /> */}
               <List className={classes.list}>
                 {products &&
                   map(products, (product, id) => (
@@ -379,11 +369,24 @@ export default class Home extends Component {
                     />
                   ))}
               </List>
-            {/* <RaisedButton label="Create Menu" primary={true}
-              onClick={this.createMenu}      
-            /> */}
-            </Paper>
-        
+            </Paper> */}
+          <Paper className={classes.paper}>
+            <Subheader>Orders</Subheader>
+            <List className={classes.list}>
+              {orders &&
+                map(orders, (order, users) => (
+                  <div> <h3>{users}</h3>
+                  {map(order,(item,key) => (
+                      <div key={key}><h4>{key}</h4>
+                      {map(item, (prod, idx) => (
+                        <div key={idx}>{prod.name} : {prod.quantity}</div>
+                      ))}
+                      </div>
+                  ))}
+                  </div>
+                ))}
+            </List>
+          </Paper>  
         </div>
       </div>
     )

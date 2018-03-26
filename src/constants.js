@@ -4,6 +4,7 @@ export const ACCOUNT_PATH = '/account'
 export const LOGIN_PATH = '/login'
 export const SIGNUP_PATH = '/signup'
 export const MENU_PATH = '/menus'
+export const ORDER_PATH = '/menus'
 export const NEW_MENU_PATH = '/newMenu'
 
 export const ACCOUNT_FORM_NAME = 'account'

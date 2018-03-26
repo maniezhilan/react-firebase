@@ -17,6 +17,7 @@ export const CheckoutDialog = ({
     onSubmit,
     myCart,
     submit,
+    totalPrice,
 }) => (
     <Dialog
         //autoDetectWindowHeight={true}
@@ -29,19 +30,6 @@ export const CheckoutDialog = ({
                 <RaisedButton label="Checkout" primary={true} onTouchTap={submit} />
             ]}>
             <form onSubmit={onSubmit} className={classes.inputs}>
-            
-                {/* {orderDates &&
-                    map(orderDates, (product, date) => (    
-                    <ProductsList title="Products" name={date}>
-                                {map(product,(item,id) => (
-                            <ProductItemClass 
-                                    key={id}
-                                    date={date}
-                                    product={item}
-                                    />
-                                ))}
-                        </ProductsList>
-                    ))} */}
                 {myCart && 
                     [...myCart].map(([date, items]) => {
                     return <div key={date} > <h4> {date} </h4> 
@@ -51,7 +39,7 @@ export const CheckoutDialog = ({
                      </div> 
                     })
                 }  
-                  
+                Total: {totalPrice}
             </form>  
            </Dialog>   
 )

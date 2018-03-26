@@ -28,18 +28,20 @@ export default class CartClass extends Component {
     
 
     render() {
-        const { count, myCart } = this.props
+        const { count, myCart, totalPrice  } = this.props
+        console.log('totalPrice::',totalPrice)
         const { openCart } = this.state
         return (
             <div className="counter">
                {/* <button type="button" >View cart: {count}</button> */}
-                <RaisedButton secondary label={`View cart: ${count}`} primary={true} onTouchTap={this.openCart}/>
+                <RaisedButton secondary label={`Cart Items: ${count} : Total: $ ${totalPrice} `} primary={true} onTouchTap={this.openCart}/>
 
                 {openCart && 
                     <CheckoutDialog
                     open={openCart}
                     onRequestCloseMenu={this.onRequestCloseMenu}
                     myCart={myCart}
+                    totalPrice={totalPrice}
                     />
 
                 }

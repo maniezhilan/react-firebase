@@ -81,10 +81,11 @@ export default class Menus extends Component {
       edit: false,
       openCart: false,
       addedIds: [],
-      quantityById: {},
+      quantityByDateId: new Map(),
       count:0,
       item: [{ productId: '', name: '', quantity: 0 }],
-      myCart : new Map()
+      myCart : new Map(),
+      totalPrice: 0
 
     }
     this.handleRemoveDailyMenu = this.handleRemoveDailyMenu.bind(this)
@@ -115,12 +116,6 @@ export default class Menus extends Component {
       email: PropTypes.string
     })
   }
-
-  forceUpdateHandler() {
-    console.log('hmmm...')
-    this.setState({orderDates: this.state.orderDates})
-    this.forceUpdate();
-  };
 
   handleClick = () => {
     this.setState({
@@ -306,33 +301,84 @@ checkoutCart = (date, item) => {
         myCart.set(date, newVal)
       }
     }
-    console.log(date, '---print cart ---', myCart.get(date))
+    //console.log(date, '---print cart ---', myCart.get(date))
   } else {
     myCart.set(date, [item])
   }
   this.setState({myCart: myCart})
 }
 
+//Useful method to sum values of properties
+sumByProps = (items, prop) => {
+    return items.reduce(function (a, b) {
+      return a + b[prop];
+  }, 0);
+}
+
+sumValues = (items) => {
+  return items.reduce(function (a, b) {
+    return a + b;
+  }, 0);
+}
+
+splitString = (stringToSplit, separator) => {
+  //console.log('stringToSplit.split---', stringToSplit.split('-')[2]);
+  return stringToSplit.split('-')[2]
+}
+
+getProductPrice = (productId, quantity) => {
+  console.log(this.props.products[productId].price * quantity )
+  return this.props.products[productId].price * quantity
+}
+
+  cartTotal = (newDailyOrders) => {
+    let values = Array.from(this.state.myCart.values())
+  console.log('cart::',values)
+  //console.log('prod::', this.props.products)
+  
+  values.forEach((item,index) => {
+    console.log('--item--',item)
+    this.setState({totalPrice: this.state.totalPrice+ this.getProductPrice(item[index].productId,item[index].quantity)})
+    
+  })
+  console.log('totalPrice::', this.state.totalPrice)
+}
 
 
 showCartContent = (date, params) => {
-  this.setState({ count: this.state.count + params.quantity})
+  let quantityByDateId = this.state.quantityByDateId
+  quantityByDateId.set(date + '-' + params.productId, params.quantity)
+  this.setState({ quantityByDateId: quantityByDateId})
+  //console.log(this.state.quantityByDateId)
+  let values = Array.from(this.state.quantityByDateId.values())
+  this.setState({ count: this.sumValues(values)})
+  // let prices = Array.from(this.state.myCart.values())
+  // console.log('cart::', prices)
+  // //console.log('prod::', this.props.products)
+
+  // prices.forEach((item, index) => {
+  //   console.log('--item--', item)
+  //   this.setState({ totalPrice: this.state.totalPrice + this.getProductPrice(item[index].productId, item[index].quantity) })
+
+  // })
+  // console.log('totalPrice::', this.state.totalPrice)
 }
 
 saveOrders=() => {
   const { account} = this.props
-  let keys = [...this.state.myCart.keys()];
-  let orders = []
-  keys.forEach(key => {
-    orders[key] = this.state.myCart.get(key)
+  let dates = [...this.state.myCart.keys()];
+  let menus = this.props.menus
+  let updates = {};
+  dates.forEach(date => {
+    let ordersByDate = this.state.myCart.get(date)
+    Object.keys(ordersByDate).forEach(function (key) {
+      let updatedItem = menus[date].filter(menu => (menu.productId === ordersByDate[key].productId))
+        updatedItem[0].quantity = (updatedItem[0].quantity - ordersByDate[key].quantity)
+        updates[`/menus/${date}/${key}`] = updatedItem[0] 
+    });
+    updates[`/orders/${account.username}/${date}`] = ordersByDate
+    this.props.firebase.database().ref().update(updates)      
   });
-  this.setState({ orderDates: orders })
-  console.log('--save--', this.state.orderDates)
-  return this.props.firebase.set(`/orders/${account.username}`, orders).catch(err => {
-    console.error('Error Creating weekly order: ', err) // eslint-disable-line no-console
-    this.setState({ error: 'Error Creating weekly order' })
-    return Promise.reject(err)
-  })
   this.setState({ openCart: false }) 
 
 
@@ -500,6 +546,10 @@ saveOrders=() => {
             showCart={this.checkoutCart}
             cartCount={count}
             showCartContent={this.showCartContent}
+            checkoutCart={this.checkoutCart}
+            myCart={this.state.myCart}
+            cartTotal={this.cartTotal}
+            totalPrice={this.state.totalPrice}
             />
             
           }  

@@ -4,6 +4,7 @@ import Home from './Home'
 import LoginRoute from './Login'
 import SignupRoute from './Signup'
 import MenusRoute from './Menus'
+import OrdersRoute from './Orders'
 import AccountRoute from './Account'
 import RecoverRoute from './Recover'
 import NotFoundRoute from './NotFound'
@@ -20,6 +21,7 @@ export const createRoutes = store => ({
     LoginRoute,
     SignupRoute,
     MenusRoute(store), // async route definitions recieve store
+    OrdersRoute(store),
     RecoverRoute(store), // async route definitions recieve store
     /* Place all Routes above here so NotFoundRoute can act as a 404 page */
     NotFoundRoute(store) // async route definitions recieve store

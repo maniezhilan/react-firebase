@@ -20,6 +20,7 @@ export default class AddToCartButton extends Component {
             id:'',
             name:'',
             date:'',
+            price: 0
             //inputValue:''
         }
     }
@@ -44,6 +45,9 @@ export default class AddToCartButton extends Component {
         this.setState({
             date: this.props.date
         })
+        this.setState({
+            price: this.props.product.price * this.state.count
+        })
 
     }
 
@@ -62,6 +66,9 @@ export default class AddToCartButton extends Component {
         this.setState({
             date: this.props.date
         })
+        this.setState({
+            price: this.props.product.price * this.state.count
+        })
     }
 
     handleChange = (e) => {
@@ -70,7 +77,7 @@ export default class AddToCartButton extends Component {
 
 
     render() {
-        const { count } = this.state
+        const { count,price } = this.state
         const { product, date } = this.props
 
         return (

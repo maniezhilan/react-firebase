@@ -8,7 +8,9 @@ import {
   grey900,
   white,
   grey400,
-  darkBlack
+  darkBlack,
+  virunthuGreen,
+  orange50
 } from 'material-ui/styles/colors'
 import { fade } from 'material-ui/utils/colorManipulator'
 import spacing from 'material-ui/styles/spacing'

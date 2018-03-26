@@ -18,7 +18,7 @@ export default class ProductItemClass extends Component {
     static propTypes = {
         product: PropTypes.shape({
             name: PropTypes.string.isRequired,
-            //price: PropTypes.number.isRequired,
+            price: PropTypes.number.isRequired,
             quantity: PropTypes.number.isRequired
         }).isRequired
         
@@ -31,7 +31,7 @@ export default class ProductItemClass extends Component {
             // this.setState(prevState => ({
             //     orderDates: [...prevState.orderDates, date]
             // }))
-        let newDailyOrders = { productId: event.currentTarget.id, name: event.currentTarget.name, quantity: parseInt(event.currentTarget.value) }
+        let newDailyOrders = { productId: event.currentTarget.id, name: event.currentTarget.name, quantity: parseInt(event.currentTarget.value) , price: event.currentTarget.price}
             // this.setState({
             //      dailyOrders: newDailyOrders
             //  })
@@ -39,6 +39,7 @@ export default class ProductItemClass extends Component {
         this.props.showCart(date,newDailyOrders) 
         this.props.showCartContent(date, newDailyOrders)
         this.props.checkoutCart(date, newDailyOrders)
+        this.props.cartTotal(newDailyOrders)
         //this.props.forceUpdate()    
     }
 
