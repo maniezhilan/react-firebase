@@ -327,7 +327,7 @@ splitString = (stringToSplit, separator) => {
 }
 
 getProductPrice = (productId, quantity) => {
-  console.log(this.props.products[productId].price * quantity )
+  console.log(this.props.products, productId)
   return this.props.products[productId].price * quantity
 }
 
@@ -337,8 +337,13 @@ getProductPrice = (productId, quantity) => {
   //console.log('prod::', this.props.products)
   
   values.forEach((item,index) => {
-    console.log('--item--',item)
-    this.setState({totalPrice: this.state.totalPrice+ this.getProductPrice(item[index].productId,item[index].quantity)})
+   
+    item.forEach((prod) => {
+      console.log('--item--totalPrice', prod.productId)
+      this.setState({
+        totalPrice: this.state.totalPrice + this.getProductPrice(prod.productId, prod.quantity)})
+    })
+    //this.setState({totalPrice: this.state.totalPrice+ this.getProductPrice(item[index].productId,item[index].quantity)})
     
   })
   console.log('totalPrice::', this.state.totalPrice)
@@ -399,7 +404,7 @@ saveOrders=() => {
     const { menus, auth, account, products, orders, handleSubmit } = this.props
     const { showMenuForm, searchText, dailyMenus, open, edit, date, item, openCart, onRequestCloseMenu, orderDates, count } = this.state
     // Menu Route is being loaded
-    
+    console.log('selected',this.state.selectedProducts)
    
     if (this.props.children) {
       // pass all props to children routes
@@ -511,6 +516,7 @@ saveOrders=() => {
                         dataSourceConfig={this.dataSourceConfig}
                         openOnFocus={true}
                         onNewRequest={this.handleDailyMenuNameChange(idx)}
+                        //filter={AutoComplete.noFilter}
                         searchText={dailyMenu.searchText}
                         filter={(searchText, key) => (key.indexOf(dailyMenu.searchText) !== -1)}
                       />
