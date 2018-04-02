@@ -26,13 +26,13 @@ export default class ProductItemClass extends Component {
 
     //TODO: parent comp need to get these states to show in cart
     orders = (event) => {
-        //console.log(event.currentTarget)
+        console.log(event.currentTarget)
         let date = event.currentTarget.getAttribute('data-date')
         let price = event.currentTarget.getAttribute('data-price')
             // this.setState(prevState => ({
             //     orderDates: [...prevState.orderDates, date]
             // }))
-        let newDailyOrders = { productId: event.currentTarget.id, name: event.currentTarget.name, quantity: parseInt(event.currentTarget.value) , price: price}
+        let newDailyOrders = { productId: event.currentTarget.id, name: event.currentTarget.name, quantity: parseFloat(event.currentTarget.value) , price: price}
             // this.setState({
             //      dailyOrders: newDailyOrders
             //  })
@@ -40,7 +40,7 @@ export default class ProductItemClass extends Component {
         this.props.showCart(date,newDailyOrders) 
         this.props.showCartContent(date, newDailyOrders)
         this.props.checkoutCart(date, newDailyOrders)
-        this.props.cartTotal(newDailyOrders)
+        this.props.cartTotal(date,newDailyOrders)
         //this.props.forceUpdate()    
     }
 

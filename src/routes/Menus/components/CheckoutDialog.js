@@ -34,7 +34,7 @@ export const CheckoutDialog = ({
                     [...myCart].map(([date, items]) => {
                     return <div key={date} > <h4> {date} </h4> 
                         {
-                            items.map((object, i) => <div key={i}> {object.name} - {object.quantity}</div>
+                            items.map((object, i) => <div key={i}> {object.name} - {object.quantity} {object.uom}</div>
                         )}
                      </div> 
                     })

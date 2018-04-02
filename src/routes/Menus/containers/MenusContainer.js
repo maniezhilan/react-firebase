@@ -61,7 +61,7 @@ const styles = {
 
 @firebaseConnect([
     { path: 'menus', queryParams: ['orderByKey', 'limitToLast=7'] }, // 10 most recent
-    { path: 'products', queryParams: ['orderByKey', 'limitToLast=5'] },
+    { path: 'products', queryParams: ['orderByKey', 'limitToLast=100'] },
     { path: 'orders', queryParams: ['orderByKey', 'limitToLast=7'] }
 ])
 @connect(({ firebase }, { params }) => ({
@@ -361,7 +361,8 @@ splitString = (stringToSplit, separator) => {
 }
 
 getProductPrice = (productId, quantity) => {
-  //console.log(this.props.products, productId)
+  console.log(this.props.products, productId, quantity, this.props.products[productId].price * quantity)
+
   return this.props.products[productId].price * quantity
 }
 
@@ -379,22 +380,26 @@ getProductPrice = (productId, quantity) => {
     return this.props.products[productId].uom || ''
   }
 
-  cartTotal = () => {
+  cartTotal = (date,params) => {
+    //TODO: check if totalPrice needs to be '-' or '+' based on quantity more or quanity less  
     let values = Array.from(this.state.myCart.values())
-  //console.log('cart::',values)
+    console.log('cart::',values)
   //console.log('prod::', this.props.products)
-  
+  let total = 0;
   values.forEach((item,index) => {
    
     item.forEach((prod) => {
-      //console.log('--item--totalPrice', prod.productId)
-      this.setState({
-        totalPrice: this.state.totalPrice + this.getProductPrice(prod.productId, prod.quantity)})
-    })
+      console.log('--item--totalPrice', prod.productId, prod.quantity)
+    //   this.setState({
+    //     totalPrice: this.state.totalPrice + this.getProductPrice(prod.productId, prod.quantity)})
+    // })
     //this.setState({totalPrice: this.state.totalPrice+ this.getProductPrice(item[index].productId,item[index].quantity)})
-    
+      total = total + this.getProductPrice(prod.productId, prod.quantity)
+    })
   })
-  //console.log('totalPrice::', this.state.totalPrice)
+    this.setState({
+         totalPrice: total
+    })
 }
 
 
