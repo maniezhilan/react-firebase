@@ -9,7 +9,7 @@ import {
   white,
   grey400,
   darkBlack,
-  virunthuGreen,
+  vGreen,
   orange50
 } from 'material-ui/styles/colors'
 import { fade } from 'material-ui/utils/colorManipulator'
@@ -21,7 +21,7 @@ export default {
   zIndex: zIndex,
   fontFamily: 'Roboto, sans-serif',
   palette: {
-    primary1Color: teal500,
+    primary1Color: vGreen,
     primary2Color: teal700,
     primary3Color: teal100,
     accent1Color: pinkA200,

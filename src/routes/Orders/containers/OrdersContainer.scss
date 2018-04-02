@@ -2,27 +2,13 @@
 
 .container {
   @extend .flex-column-center;
-  justify-content: flex-start;
-  padding-top: 30px;
-  flex-grow: 2;
-  box-sizing: border-box;
-  overflow-y: scroll;
+  padding-top: 4rem;
 }
-
-.tiles {
-  @extend .flex-row-center;
-  -webkit-flex-flow: row wrap;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.progress {
+.products {
   @extend .flex-column-center;
-  justify-content: flex-start;
-  padding-top: 30px;
-  flex-grow: 2;
-  box-sizing: border-box;
-  overflow-y: scroll;
-  padding-left: 5%;
-  padding-right: 5%;
+  margin-top: 4rem;
+}
+.paper {
+  padding: 1rem;
+  margin-bottom: 4rem;
 }

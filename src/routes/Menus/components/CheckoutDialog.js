@@ -39,7 +39,7 @@ export const CheckoutDialog = ({
                      </div> 
                     })
                 }  
-                Total: {totalPrice}
+                Total: $ {totalPrice}
             </form>  
            </Dialog>   
 )

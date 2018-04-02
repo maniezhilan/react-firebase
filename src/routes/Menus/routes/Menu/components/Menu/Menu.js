@@ -4,7 +4,7 @@ import classes from './Menu.scss'
 
 export const Menu = ({ menus, params: { menuid } }) => (
   <div className={classes.container}>
-    {menus[menuid] ? (
+    {/* {menus[menuid] ? (
       <div>
         <h2>Menu Container</h2>
         <pre>{JSON.stringify(menus[menuid])}</pre>
@@ -13,7 +13,8 @@ export const Menu = ({ menus, params: { menuid } }) => (
       <div className={classes.empty}>
         <span>Menu Not Found--</span>
       </div>
-    )}
+    )} */}
+    Boss
   </div>
 )
 

@@ -23,8 +23,8 @@ import EditProductDialog from '../components/EditProductDialog'
 import MenuDialog from '../components/MenuDialog'
 import classes from './HomeContainer.scss'
 import RaisedButton from 'material-ui/RaisedButton'
+import FlatButton from 'material-ui/FlatButton';
 import { pick } from 'lodash'
-
 
 // const populates = [{ child: 'owner', root: 'users', keyProp: 'uid' }]
 
@@ -128,7 +128,7 @@ export default class Home extends Component {
 
 
   handleAddDailyMenu = () => {
-    this.setState({ dailyMenus: this.state.dailyMenus.concat([{ name: '', quantity: '' }]) });
+    this.setState({ dailyMenus: this.state.dailyMenus.concat([{ name: '', quantity: '', price:0 }]) });
   }
 
   handleRemoveDailyMenu = (idx) => () => {
@@ -238,7 +238,7 @@ export default class Home extends Component {
     menu.endDate = this.state.endDate
     menu.selectedProducts = this.state.selectedProducts
     menu.dates = this.getDateRange(menu.startDate, menu.endDate)
-    console.log(menu.selectedProducts);
+    //console.log(menu.selectedProducts);
   }
 
   dataSourceConfig = {
@@ -294,10 +294,10 @@ export default class Home extends Component {
     const { showMenuModal } = this.state
     const { product } = this.state
     const { selectedProducts } = this.state
-    console.log(orders)
+    //console.log(product)
     return (
       <div
-        className={classes.container}
+        className={classes.bg}
         style={{ color: Theme.palette.primary2Color }}>
         {error ? (
           <Snackbar
@@ -308,13 +308,11 @@ export default class Home extends Component {
           />
         ) : null}
         <div className={classes.info}>
-          <span>data loaded from</span>
-          <span>
-            <a href="https://krabby-2017.firebaseio.com/">Krabby Platform</a>
-          </span>
-          <span style={{ marginTop: '2rem' }}>
-            <strong>Manage your products </strong>
-          </span>
+          <div className={classes.centered}>
+             <a href="/menus">
+              <img className={classes.tile} src="https://firebasestorage.googleapis.com/v0/b/krabby-2017.appspot.com/o/vtile.png?alt=media&token=3887a9f7-c712-4c8b-93f9-ffb656b46a52"/>
+             </a>
+          </div>
         </div>
         <div className={classes.products}>
 
@@ -370,7 +368,8 @@ export default class Home extends Component {
                   ))}
               </List>
             </Paper> */}
-          <Paper className={classes.paper}>
+            
+          {/* <Paper className={classes.paper}> //TODO: Move to orders page
             <Subheader>Orders</Subheader>
             <List className={classes.list}>
               {orders &&
@@ -386,7 +385,7 @@ export default class Home extends Component {
                   </div>
                 ))}
             </List>
-          </Paper>  
+          </Paper>   */}
         </div>
       </div>
     )

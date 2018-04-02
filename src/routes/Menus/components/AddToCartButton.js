@@ -32,9 +32,14 @@ export default class AddToCartButton extends Component {
 
     }
 
-    incrementCount = () => {
+    counter = () => {
+
+    }
+
+    incrementCount = (event) => {
+        //this.props.qty(event)
         this.setState({
-            count: this.state.count + 1
+            count: this.state.count + this.props.product.minimumQty
         });
         this.setState({
             id: this.props.product.productId
@@ -45,16 +50,17 @@ export default class AddToCartButton extends Component {
         this.setState({
             date: this.props.date
         })
+       // console.log('this.props.product', this.props.product)
         this.setState({
-            price: this.props.product.price * this.state.count
+            price: this.props.product.price
         })
-
+       
     }
 
-    decrementCount = () => {
+    decrementCount = (event) => {
         if (this.state.count!==0){
             this.setState({
-                count: this.state.count - 1
+                count: this.state.count - this.props.product.minimumQty
             });
         }
         this.setState({
@@ -67,8 +73,10 @@ export default class AddToCartButton extends Component {
             date: this.props.date
         })
         this.setState({
-            price: this.props.product.price * this.state.count
+            price: this.props.product.price
         })
+        //console.log(this.state.count)
+        //this.props.qty(event)
     }
 
     handleChange = (e) => {
@@ -79,6 +87,8 @@ export default class AddToCartButton extends Component {
     render() {
         const { count,price } = this.state
         const { product, date } = this.props
+        //console.log('count::', count, ':', product)
+
 
         return (
             <div className="counter">
@@ -87,10 +97,17 @@ export default class AddToCartButton extends Component {
                         <SvgIconRemoveCircle />
                     </IconButton>
                 }
+
+                {/* <IconButton data-date={date} data-price={product.price} name={product.name} value={count} id={product.id} onClick={this.props.qty} disabled={(count === 0 )}>
+                    <SvgIconRemoveCircle />
+                </IconButton> */}
                 
                 {/* <input type="number" id={this.state.id} data-date={date} name={this.state.name} value={count} onChange={this.handleChange} onBlur={this.props.qty} /> */}
-                {count}
-             
+                {count} {product.uom}.
+                
+                {/* <IconButton data-date={date} data-price={this.state.price} name={this.state.name} value={count} id={this.state.id} onClick={this.props.qty} disabled={(count >= product.quantity)}>
+                    <SvgIconAddCircle />
+                </IconButton> */}
                 
                 {
                     <IconButton secondary={true}  onClick={this.incrementCount} disabled={(count >= product.quantity)}>
@@ -99,7 +116,7 @@ export default class AddToCartButton extends Component {
                 }
 
                 {
-                    <IconButton data-date={date} name={this.state.name} value={count} id={this.state.id} onClick={this.props.qty} disabled={(count === 0 || count > product.quantity)}>
+                    <IconButton data-date={date} data-price={this.state.price} name={this.state.name} value={count} id={this.state.id} onClick={this.props.qty} disabled={(count > product.quantity)}>
                         <SvgIconAddShoppingCart />
                     </IconButton>
                 }

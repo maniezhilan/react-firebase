@@ -26,12 +26,13 @@ export default class NewProductPanel extends Component {
     const { newProduct } = this.refs
     const { text } = this.state
     const { description } = this.state
-    const { price } = this.state
-    this.props.onNewClick({ text, description, price})
+    const { price, uom, minimumQty} = this.state
+    this.props.onNewClick({ text, description, price, uom, minimumQty})
     this.refs.newProductText.getInputNode().value = ''
     this.refs.newProductPrice.getInputNode().value = ''
     this.refs.newProductDescription.getInputNode().value = ''
-
+    this.refs.newProductUom.getInputNode().value = ''
+    this.refs.newProductMinimumQty.getInputNode().value = ''
   }
 
 
@@ -56,6 +57,16 @@ export default class NewProductPanel extends Component {
             floatingLabelText="New Product Price"
             ref="newProductPrice"
             onChange={({ target }) => this.setState({ price: target.value || ''})}
+          />
+          <TextField
+            floatingLabelText="Uom"
+            ref="uom"
+            onChange={({ target }) => this.setState({ uom: target.value || '' })}
+          />
+          <TextField
+            floatingLabelText="minimumQty"
+            ref="minimumQty"
+            onChange={({ target }) => this.setState({ minimumQty: target.value || '' })}
           />
           
           <IconButton

@@ -109,6 +109,7 @@ config.compiler_vendors = config.compiler_vendors.filter(dep => {
 // ------------------------------------
 function base() {
   const args = [config.path_base].concat([].slice.call(arguments))
+  console.log('base:: ',path.resolve.apply(path, args))
   return path.resolve.apply(path, args)
 }
 

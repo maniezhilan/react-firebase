@@ -68,9 +68,16 @@ import ProductItemClass from './ProductItemClass'
 //     console.log('totalPrice::', totalPrice)
 // }
 
+const customContentStyle = {
+    width: '100%',
+    maxWidth: 'none',
+};
+
+
 export const CartDialog = ({
     open,
     onRequestCloseMenu,
+    onRequestCloseCart,
     onSubmit,
     menus,
     orderDates,
@@ -86,13 +93,14 @@ export const CartDialog = ({
     totalPrice
 }) => (
     <Dialog
-        //autoDetectWindowHeight={true}
+        autoDetectWindowHeight={true}
         autoScrollBodyContent={true}
         title="Cart"
         open={open}
         contentClassName={classes.container}
+            contentStyle={customContentStyle}
             actions={[
-                <FlatButton label="Cancel" secondary onTouchTap={onRequestCloseMenu} />,
+                <FlatButton hoverColor="white" label="Cancel" secondary onTouchTap={onRequestCloseMenu} />,
                 // <RaisedButton label="Checkout" primary={true} onTouchTap={submit} />
             ]}>
             <form onSubmit={onSubmit} className={classes.inputs}>

@@ -40,14 +40,23 @@ const styles = {
     justifyContent: 'space-around',
   },
   gridList: {
-    width: 500,
-    height: 450,
+    width: 390,
+    //height: 450,
     overflowY: 'auto',
-    
+    //overflowX: 'auto'
   },
   gridTile: {
     cursor: 'pointer'
+  },
+  
+  flatButton: {
+    right: '120px'
+  },
+
+  weeklyMenu: {
+    width: 400
   }
+
 };
 
 @firebaseConnect([
@@ -72,8 +81,8 @@ export default class Menus extends Component {
       error: null,
       menu: Object.assign({}, this.props.menu),
       date: Object.assign({}, this.props.date),
-      dailyMenus: [{ productId:'',name: '', quantity: 0, searchText: ''}],
-      dailyOrders: [{ productId: '', name: '', quantity: 0}],
+      dailyMenus: [{ productId:'',name: '', quantity: 0, searchText: '', price:0, img: '', uom: ''}],
+      dailyOrders: [{ productId: '', name: '', quantity: 0, price: 0}],
       orderDates: [],
       showMenuForm: false,
       selectedProducts: Object.assign([], this.props.selectedProducts),
@@ -83,7 +92,7 @@ export default class Menus extends Component {
       addedIds: [],
       quantityByDateId: new Map(),
       count:0,
-      item: [{ productId: '', name: '', quantity: 0 }],
+      item: [{ productId: '', name: '', quantity: 0, price: 0 }],
       myCart : new Map(),
       totalPrice: 0
 
@@ -169,7 +178,11 @@ export default class Menus extends Component {
   handleDailyMenuNameChange = (idx) => (evt) => {
     const newDailyMenus = this.state.dailyMenus.map((dailyMenu, sidx) => {
       if (idx !== sidx) return dailyMenu;
-      return { ...dailyMenu, productId: evt.id, name: evt.text, searchText: evt.text};
+      return { ...dailyMenu, productId: evt.id, name: evt.text, searchText: evt.text,
+         price: this.getProductPriceById(evt.id),
+         img: this.getProductImgById(evt.id),
+         uom: this.getProductUom(evt.id)
+        };
     });
     this.setState({dailyMenus: newDailyMenus});
   }
@@ -185,7 +198,7 @@ export default class Menus extends Component {
 
 
   handleAddDailyMenu = () => {
-    this.setState({ dailyMenus: this.state.dailyMenus.concat([{ productId: '', name: '', quantity: 0, searchText: '' }]) });
+    this.setState({ dailyMenus: this.state.dailyMenus.concat([{ productId: '', name: '', quantity: 0, searchText: '', price: 0, img:'', uom:'' }]) });
   }
 
   handleRemoveDailyMenu = (idx) => () => {
@@ -197,6 +210,18 @@ export default class Menus extends Component {
   dataSourceConfig = {
     text: 'text',
     value: 'id',
+  };
+
+  handleUpdateInput = (searchText) => {
+    this.setState({
+      searchText: searchText,
+    });
+  };
+
+  handleNewRequest = () => {
+    this.setState({
+      searchText: '',
+    });
   };
 
 
@@ -222,6 +247,15 @@ export default class Menus extends Component {
     console.log(this.props.menus, '---', this.props.menus[date])
     this.setState({ dailyMenus: this.props.menus[date]})
 
+  }
+
+  deleteMenu = (date) => {
+    console.log('--delete--',date)
+    return this.props.firebase.remove(`/menus/${date}`).catch(err => {
+      console.error('Error updating daily menu: ', err) // eslint-disable-line no-console
+      this.setState({ error: 'Error updating daily menu' })
+      return Promise.reject(err)
+    })
   }
 
   createProductDatasource =() => {
@@ -327,30 +361,45 @@ splitString = (stringToSplit, separator) => {
 }
 
 getProductPrice = (productId, quantity) => {
-  console.log(this.props.products, productId)
+  //console.log(this.props.products, productId)
   return this.props.products[productId].price * quantity
 }
 
-  cartTotal = (newDailyOrders) => {
+  getProductPriceById = (productId) => {
+    //console.log(this.props.products, productId)
+    return this.props.products[productId].price || 0
+  }
+
+  getProductImgById = (productId) => {
+    //console.log(this.props.products, productId)
+    return this.props.products[productId].img || ''
+  }
+
+  getProductUom = (productId) => {
+    return this.props.products[productId].uom || ''
+  }
+
+  cartTotal = () => {
     let values = Array.from(this.state.myCart.values())
-  console.log('cart::',values)
+  //console.log('cart::',values)
   //console.log('prod::', this.props.products)
   
   values.forEach((item,index) => {
    
     item.forEach((prod) => {
-      console.log('--item--totalPrice', prod.productId)
+      //console.log('--item--totalPrice', prod.productId)
       this.setState({
         totalPrice: this.state.totalPrice + this.getProductPrice(prod.productId, prod.quantity)})
     })
     //this.setState({totalPrice: this.state.totalPrice+ this.getProductPrice(item[index].productId,item[index].quantity)})
     
   })
-  console.log('totalPrice::', this.state.totalPrice)
+  //console.log('totalPrice::', this.state.totalPrice)
 }
 
 
 showCartContent = (date, params) => {
+  //console.log(date,params);
   let quantityByDateId = this.state.quantityByDateId
   quantityByDateId.set(date + '-' + params.productId, params.quantity)
   this.setState({ quantityByDateId: quantityByDateId})
@@ -396,6 +445,15 @@ saveOrders=() => {
     this.setState({ openCart: !this.state.openCart }) 
   }
 
+  onRequestCloseCart = () => {
+    console.log('onRequestCloseCart');
+    this.setState({ openCart: !this.state.openCart })
+    this.setState({myCart: new Map()})
+    this.cartTotal();
+    this.setState({count:0})
+    this.setState({totalPrice:0})
+  }
+
   
 
   
@@ -404,7 +462,7 @@ saveOrders=() => {
     const { menus, auth, account, products, orders, handleSubmit } = this.props
     const { showMenuForm, searchText, dailyMenus, open, edit, date, item, openCart, onRequestCloseMenu, orderDates, count } = this.state
     // Menu Route is being loaded
-    console.log('selected',this.state.selectedProducts)
+    //console.log('menus', menus)
    
     if (this.props.children) {
       // pass all props to children routes
@@ -420,14 +478,14 @@ saveOrders=() => {
             
             <Subheader>Weekly Menu</Subheader>
             {account && account.rolename === 'admin' && !showMenuForm && 
-               <div> 
+               <div style={styles.weeklyMenu}> 
               <List className={classes.list}>   
               {menus &&
                 map(menus, (date, id) => (
                   <ListItem key={id}
                     
                     rightIcon={ account && account.rolename === 'admin' &&
-                    <Delete onClick="" />
+                      <Delete onClick={() => { if (confirm(`Delete the menu for ${id} ?`)) { this.deleteMenu(id)}; }}/>
                     }
 
                     secondaryText={
@@ -439,7 +497,7 @@ saveOrders=() => {
 
                     rightIconButton={account && account.rolename === 'admin' &&
 
-                      <FlatButton label="Edit" secondary={true} onClick={() => this.editMenu(id)}>
+                      <FlatButton style={styles.flatButton} label="Edit" secondary={true} onClick={() => this.editMenu(id)}>
 
                       </FlatButton>
                     }
@@ -453,9 +511,10 @@ saveOrders=() => {
             {account && account.rolename !== 'admin' && !showMenuForm && !edit &&
             <div style={styles.root}>
               <GridList
-                cellHeight={180}
+                cellHeight={200}
+                padding={1}
                 style={styles.gridList}
-                
+                cols = {1}
               >      
                 {menus && 
                   map(menus, (date,idx) => (  
@@ -463,15 +522,18 @@ saveOrders=() => {
                           <GridTile
                             key={id}
                             title={item.name}
-                            subtitle={<span> Qty <b>{(item.quantity === '0') ? 'Sold out' : item.quantity}</b><br/>{idx}</span>}
+                            // subtitle={<span> <b>{(item.quantity === '0') ? 'Sold out' : item.quantity}</b><br/>{idx}</span>}
+                            subtitle={<span>{idx}</span>}
                             //actionIcon={<IconButton onClick={() => this.addToCart(idx,item,1)}>Order</IconButton>}
-                            actionPosition="right"
+                            //actionPosition="right"
                             titlePosition="bottom"
                             onClick={this.openCart}
                             style={styles.gridTile}
+                            titlePosition="top"
+                            titleBackground="linear-gradient(to bottom, rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.3) 70%,rgba(0,0,0,0) 100%)"
                           >
                           
-                            <img src="http://www.material-ui.com/v0.19.4/images/grid-list/burger-827309_640.jpg" />
+                      <img src={item.img} />
                           </GridTile>
                          ))
               ))} 
@@ -520,6 +582,15 @@ saveOrders=() => {
                         searchText={dailyMenu.searchText}
                         filter={(searchText, key) => (key.indexOf(dailyMenu.searchText) !== -1)}
                       />
+                      {/* <AutoComplete
+                        hintText={`Type product #${idx + 1} name`}
+                        searchText={this.state.searchText}
+                        onUpdateInput={this.handleUpdateInput}
+                        onNewRequest={this.handleNewRequest}
+                        dataSource={this.state.selectedProducts}
+                        filter={(searchText, key) => (key.indexOf(dailyMenu.searchText) !== -1)}
+                        openOnFocus={true}
+                      /> */}
 
                       <TextField
                         hintText={`Type product #${idx + 1} quantity`}
@@ -546,6 +617,7 @@ saveOrders=() => {
             <CartDialog
             open = {openCart}
             onRequestCloseMenu={this.onRequestCloseMenu}
+            onRequestCloseCart={this.onRequestCloseCart}
             menus={menus}
             onSubmit={this.saveOrders}
             orderDates={this.state.myCart}

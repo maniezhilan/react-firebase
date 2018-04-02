@@ -66,15 +66,14 @@ export default class Product extends Component {
           secondaryText={
             <p>
 
-              <span className="Product-Text">{product.text}</span>
+              <span className="Product-Text">{product.name}  Price for 1 $: {product.price}</span>
               <br />
-              <span className="Product-Description">{product.description}</span>
-              <br />
-              <span className="Product-Price">{product.price}</span>
+              
+              <span className="Product-Price">Ordered Qty: {product.quantity} {product.uom}</span>
               <br />
             </p>
           }
-          //secondaryTextLines={2}
+          secondaryTextLines={2}
           
         />
         

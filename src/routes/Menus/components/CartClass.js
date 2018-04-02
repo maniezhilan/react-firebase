@@ -29,7 +29,6 @@ export default class CartClass extends Component {
 
     render() {
         const { count, myCart, totalPrice  } = this.props
-        console.log('totalPrice::',totalPrice)
         const { openCart } = this.state
         return (
             <div className="counter">

@@ -52,6 +52,18 @@ export const EditProductDialog = ({
           value={product.price}
           onChange={onChange}
         />
+        <TextField
+          floatingLabelText="Uom"
+          name="uom"
+          value={product.uom}
+          onChange={onChange}
+        />
+        <TextField
+          floatingLabelText="MinimumQty"
+          name="MinimumQty"
+          value={product.minimumQty}
+          onChange={onChange}
+        />
     </form>
   </Dialog>
 )

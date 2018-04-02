@@ -57,6 +57,15 @@ export default class Navbar extends Component {
     this.context.router.push('/')
   }
 
+  handleMenu = () => {
+    this.context.router.push('/menus')
+  }
+  handleOrder = () => {
+    this.context.router.push('/orders')
+  }
+
+
+
   render() {
     const { account, auth } = this.props
     const authExists = isLoaded(auth) && !isEmpty(auth)
@@ -93,12 +102,12 @@ export default class Navbar extends Component {
         <Link to={LOGIN_PATH}>
           <FlatButton label="Login" style={buttonStyle} />
         </Link>
-        <Link to={MENU_PATH}>
+        {/* <Link to={MENU_PATH}>
           <FlatButton label="Menu" style={buttonStyle} />
         </Link>
         <Link to={ORDER_PATH}>
           <FlatButton label="Orders" style={buttonStyle} />
-        </Link>
+        </Link> */}
       </div>
     )
 
@@ -112,6 +121,8 @@ export default class Navbar extends Component {
           primaryText="Account"
           onTouchTap={() => this.context.router.push(ACCOUNT_PATH)}
         />
+        <MenuItem primaryText="Menus" onTouchTap={this.handleMenu} />
+        <MenuItem primaryText="Orders" onTouchTap={this.handleOrder} />
         <MenuItem primaryText="Sign out" onTouchTap={this.handleLogout} />
       </IconMenu>
     ) : (
@@ -121,13 +132,16 @@ export default class Navbar extends Component {
     return (
       <AppBar
         title={
-          <Link to={authExists ? MENU_PATH : '/login'} className={classes.brand}>
-            <img className={classes.icon} src='https://firebasestorage.googleapis.com/v0/b/krabby-2017.appspot.com/o/virunthu-logo.svg?alt=media&token=8a9dcbb4-b26e-427f-a76b-2c6023b9f91f'/>
+          // <Link to={authExists ? MENU_PATH : '/'} className={classes.brand}>
+          //   Virundhu  
+          // </Link>
+          <Link to={'/'} className={classes.brand}>
+            Virundhu
           </Link>
           
         }
         
-        showMenuIconButton={true}
+        showMenuIconButton={false}
         iconElementRight={isLoaded(auth, account) ? rightMenu : null}
         iconStyleRight={authExists ? avatarStyles.wrapper : {}}
         className={classes.appBar}

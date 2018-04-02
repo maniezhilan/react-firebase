@@ -44,6 +44,7 @@ webpackConfig.output = {
   publicPath: project.compiler_public_path
 }
 
+
 // ------------------------------------
 // Plugins
 // ------------------------------------
@@ -104,7 +105,8 @@ if (__DEV__) {
 if (!__TEST__) {
   webpackConfig.plugins.push(
     new webpack.optimize.CommonsChunkPlugin({
-      names: ['vendor']
+      names: ['vendor','manifest'],
+      minChunks: Infinity
     })
   )
 }

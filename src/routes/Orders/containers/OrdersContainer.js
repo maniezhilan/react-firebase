@@ -2,6 +2,14 @@ import React, { Component } from 'react'
 import PropTypes, { bool } from 'prop-types'
 import { map, get, isEmpty } from 'lodash'
 import { connect } from 'react-redux'
+import classes from './OrdersContainer.scss'
+import ProductsList from '../../../routes/Menus/components/ProductsList'
+import { List } from 'material-ui/List'
+import Paper from 'material-ui/Paper'
+import Subheader from 'material-ui/Subheader'
+import DatePicker from 'material-ui/DatePicker';
+import Product from '../../../routes/Home/components/Product'
+
 import {
     firebaseConnect,
     populatedDataToJS,
@@ -61,16 +69,34 @@ export default class Orders extends Component {
 
     render() {
 
-        const { orders} = this.props
-        console.log(orders)
+        const { orders, account} = this.props
+        //console.log(orders)
 
         return (
             <div className={classes.container}>
 
                 <div className={classes.tiles}>
 
-                    <Paper className={classes.menu}>
-                        <div> Orders </div>
+                    <Paper className={classes.paper}>
+                        <Subheader>Orders</Subheader>
+                        {orders &&
+                            map(orders, (products, user) => (
+                            //<ProductsList title="Products" name={user} key={user}>
+                            <List className={classes.list}>    
+                                    {map(products, (product, date) => (
+                                    <div key={date}><h4>{date} </h4> 
+                                        { map(product, (item, id) => (
+                                            < Product 
+                                                key={id}
+                                                id={id}
+                                                product={item}
+                                            />
+                                        ))}
+                                    </div>  
+                                    ))}
+
+                                </List>
+                            ))}
                     </Paper>
                 </div>
              </div>          
