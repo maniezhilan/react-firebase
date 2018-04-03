@@ -53,6 +53,8 @@ export default class ProductItemClass extends Component {
                     title={product.name}
                     price={product.price}
                     quantity={product.quantity}
+                    minimumQty={product.minimumQty}
+                    uom={product.uom}
 
                 />
                 {product.quantity > 0 ? <AddToCartButton qty={this.orders} product={product} date={date}

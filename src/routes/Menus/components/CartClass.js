@@ -33,7 +33,7 @@ export default class CartClass extends Component {
         return (
             <div className="counter">
                {/* <button type="button" >View cart: {count}</button> */}
-                <RaisedButton secondary label={`Cart Items: ${count} : Total: $ ${totalPrice} `} primary={true} onTouchTap={this.openCart}/>
+                <RaisedButton secondary label={`Total for (${count} items) : $${totalPrice} `} primary={true} onTouchTap={this.openCart} disabled={(count === 0)}/>
 
                 {openCart && 
                     <CheckoutDialog

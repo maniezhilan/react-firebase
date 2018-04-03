@@ -100,7 +100,7 @@ export const CartDialog = ({
         contentClassName={classes.container}
             contentStyle={customContentStyle}
             actions={[
-                <FlatButton hoverColor="white" label="Cancel" secondary onTouchTap={onRequestCloseMenu} />,
+                <FlatButton hoverColor="white" label="Cancel" secondary onTouchTap={onRequestCloseCart} />,
                 // <RaisedButton label="Checkout" primary={true} onTouchTap={submit} />
             ]}>
             <form onSubmit={onSubmit} className={classes.inputs}>

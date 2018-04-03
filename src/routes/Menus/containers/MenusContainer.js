@@ -454,7 +454,7 @@ saveOrders=() => {
     console.log('onRequestCloseCart');
     this.setState({ openCart: !this.state.openCart })
     this.setState({myCart: new Map()})
-    this.cartTotal();
+    //this.cartTotal();
     this.setState({count:0})
     this.setState({totalPrice:0})
   }

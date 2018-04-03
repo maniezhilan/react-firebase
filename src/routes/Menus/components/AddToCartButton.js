@@ -50,7 +50,7 @@ export default class AddToCartButton extends Component {
         this.setState({
             date: this.props.date
         })
-       // console.log('this.props.product', this.props.product)
+        console.log('this.props.product.minimumQty', this.props.product.minimumQty)
         this.setState({
             price: this.props.product.price
         })
@@ -75,7 +75,7 @@ export default class AddToCartButton extends Component {
         this.setState({
             price: this.props.product.price
         })
-        //console.log(this.state.count)
+        console.log('this.props.product.minimumQty', this.props.product.minimumQty)
         //this.props.qty(event)
     }
 
