@@ -15,27 +15,5 @@
   @extend .flex-column-center;
 }
 
-.bg {
-      /* The image used */
-      background-image: url("https://firebasestorage.googleapis.com/v0/b/krabby-2017.appspot.com/o/vhome.jpg?alt=media&token=cfb70995-56be-4e1b-b929-172166b31fca");
-
-      /* Full height */
-      height: 100%;
-
-      /* Center and scale the image nicely */
-      background-position: center;
-      background-repeat: no-repeat;
-      background-size: cover;
-      padding-top: 120px;
-      padding-bottom: 220px;
-    }
-
-.tile {
-  padding-top: 20%;
-  padding-left: 20%;
-  width: 75%;
-  height: 50%;
-  
-}
 
 

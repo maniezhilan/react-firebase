@@ -30,7 +30,7 @@ import Delete from 'material-ui/svg-icons/action/delete'
 import FlatButton from 'material-ui/FlatButton';
 import SvgIconAddShoppingCart from "material-ui/svg-icons/action/add-shopping-cart";
 import CartDialog from "../components/CartDIalog"
-
+import { formatDate, getDateRange } from '../../../utils/dateUtil'
 
 
 const styles = {
@@ -60,7 +60,7 @@ const styles = {
 };
 
 @firebaseConnect([
-    { path: 'menus', queryParams: ['orderByKey', 'limitToLast=7'] }, // 10 most recent
+    { path: 'menus', queryParams: ['orderByKey', 'limitToLast=20'] }, // 10 most recent
     { path: 'products', queryParams: ['orderByKey', 'limitToLast=100'] },
     { path: 'orders', queryParams: ['orderByKey', 'limitToLast=7'] }
 ])
@@ -139,35 +139,7 @@ export default class Menus extends Component {
   };
 
 
-  //https://stackoverflow.com/questions/3552461/how-to-format-a-javascript-date
-  formatDate = (date) => {
-    let options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    return date.toLocaleDateString("en-US", options)
-  }
-
-
-  //https://stackoverflow.com/questions/4413590/javascript-get-array-of-dates-between-2-dates/15882220
-  getDateRange = (startDate, endDate) => {
-
-    Date.prototype.addDays = function (days) {
-      var date = new Date(this.valueOf());
-      date.setDate(date.getDate() + days);
-      return date;
-    }
-
-    let addFn = Date.prototype.addDays;
-    let interval = 1;
-
-    var retVal = [];
-    var current = new Date(startDate);
-
-    while (current <= endDate) {
-      retVal.push(this.formatDate(new Date(current)))
-      current = addFn.call(current, interval);
-    }
-    return retVal;
-  }
-
+  
   handleDateChange = (event, date) => {
     this.setState({
       date: date
@@ -178,7 +150,7 @@ export default class Menus extends Component {
   handleDailyMenuNameChange = (idx) => (evt) => {
     const newDailyMenus = this.state.dailyMenus.map((dailyMenu, sidx) => {
       if (idx !== sidx) return dailyMenu;
-      return { ...dailyMenu, productId: evt.id, name: evt.text, searchText: evt.text,
+      return { ...dailyMenu, productId: evt.id, name: evt.name, searchText: evt.name,
          price: this.getProductPriceById(evt.id),
          img: this.getProductImgById(evt.id),
          uom: this.getProductUom(evt.id)
@@ -208,7 +180,7 @@ export default class Menus extends Component {
   }
 
   dataSourceConfig = {
-    text: 'text',
+    text: 'name',
     value: 'id',
   };
 
@@ -229,9 +201,10 @@ export default class Menus extends Component {
   createMenu = () => {
     this.setState({ showMenuForm: !this.state.showMenuForm })
     let productDataSource = []
-    map(this.props.products, (product, id) => (
-      productDataSource.push(product)
-    ))
+    Object.entries(this.props.products).forEach(function(product){
+        product[1].id = product[0]
+        productDataSource.push(product[1])
+    })
     this.setState({ selectedProducts: productDataSource })
   }
 
@@ -240,11 +213,12 @@ export default class Menus extends Component {
     this.setState({ showMenuForm: !this.state.showMenuForm })
     this.setState({ date: date})
     let productDataSource = []
-    map(this.props.products, (product, id) => (
-      productDataSource.push(product)
-    ))
+    Object.entries(this.props.products).forEach(function (product) {
+      product[1].id = product[0]
+      productDataSource.push(product[1])
+    })
     this.setState({ selectedProducts: productDataSource })
-    console.log(this.props.menus, '---', this.props.menus[date])
+    //console.log(this.props.menus, '---', this.props.menus[date])
     this.setState({ dailyMenus: this.props.menus[date]})
 
   }
@@ -285,14 +259,14 @@ export default class Menus extends Component {
     this.setState({ showMenuForm: !this.state.showMenuForm })
     let day = this.state.date
     if(!this.state.edit){
-      day = this.formatDate(this.state.date)
+      day = formatDate(this.state.date)
     }
     if (this.props.menus && day in this.props.menus && !this.state.edit){
       this.setState({open:!this.state.open})
       return this.setState({ error: '`Menu exists for ${day}`' })
     }
     this.state.menu = this.state.dailyMenus
-    
+    console.log(day,this.state.menu)
     //const { firebase: { pushWithMeta } } = this.props
     // push new project with updatedBy and updatedAt
     return this.props.firebase.set(`/menus/${day}`, this.state.menu).catch(err => {
@@ -553,7 +527,7 @@ saveOrders=() => {
                 hintText="Select Date"
                 value={this.state.date}
                 onChange={this.handleDateChange}
-                formatDate={this.formatDate}
+                formatDate={formatDate}
               />
             } 
             {account && account.rolename === 'admin' && edit &&
@@ -563,7 +537,7 @@ saveOrders=() => {
             {account && account.rolename === 'admin' && open &&
               <Snackbar
                 open={open}
-                message={`Menu already exists for ${this.formatDate(date)}`}
+                message={`Menu already exists for ${formatDate(date)}`}
                 autoHideDuration={4000}
                 onRequestClose={this.handleRequestClose}
               />
@@ -572,6 +546,7 @@ saveOrders=() => {
             <RaisedButton label="Create Menu" primary={true}
             onClick={this.createMenu}/>
             } 
+            {console.log(this.state.edit)}
             {account && account.rolename === 'admin' && showMenuForm && (
               <form className={classes.inputs}>
                 <List className={classes.list}>
@@ -583,19 +558,9 @@ saveOrders=() => {
                         dataSourceConfig={this.dataSourceConfig}
                         openOnFocus={true}
                         onNewRequest={this.handleDailyMenuNameChange(idx)}
-                        //filter={AutoComplete.noFilter}
-                        searchText={dailyMenu.searchText}
                         filter={(searchText, key) => (key.indexOf(dailyMenu.searchText) !== -1)}
+                        searchText={(this.state.edit) ? dailyMenu.name : this.state.searchText}
                       />
-                      {/* <AutoComplete
-                        hintText={`Type product #${idx + 1} name`}
-                        searchText={this.state.searchText}
-                        onUpdateInput={this.handleUpdateInput}
-                        onNewRequest={this.handleNewRequest}
-                        dataSource={this.state.selectedProducts}
-                        filter={(searchText, key) => (key.indexOf(dailyMenu.searchText) !== -1)}
-                        openOnFocus={true}
-                      /> */}
 
                       <TextField
                         hintText={`Type product #${idx + 1} quantity`}
@@ -603,8 +568,8 @@ saveOrders=() => {
                         onChange={this.handleDailyMenuQtyChange(idx)}
                         type='number'
                       />
-                      {/* <RaisedButton label="Delete" secondary={true} onClick={() => { if (confirm('Delete the item?')) { this.handleRemoveDailyMenu(idx) }; }} /> */}
-                      <RaisedButton label="Delete" secondary={true} onClick={this.handleRemoveDailyMenu(idx)} />
+                      <RaisedButton label="Delete" secondary={true} onClick={() => { if (confirm('Delete the item?')) { this.handleRemoveDailyMenu(idx) }; }} />
+                      
                     </div>
                   ))}
                   <FloatingActionButton mini={true} secondary={true} onClick={this.handleAddDailyMenu}>

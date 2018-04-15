@@ -21,7 +21,7 @@ export default {
   zIndex: zIndex,
   fontFamily: 'Roboto, sans-serif',
   palette: {
-    primary1Color: vGreen,
+    primary1Color: teal500,
     primary2Color: teal700,
     primary3Color: teal100,
     accent1Color: pinkA200,

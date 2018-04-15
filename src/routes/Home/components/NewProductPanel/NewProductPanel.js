@@ -24,10 +24,8 @@ export default class NewProductPanel extends Component {
 
   handleAdd = () => {
     const { newProduct } = this.refs
-    const { text } = this.state
-    const { description } = this.state
-    const { price, uom, minimumQty} = this.state
-    this.props.onNewClick({ text, description, price, uom, minimumQty})
+    const { name, description, price, uom, minimumQty} = this.state
+    this.props.onNewClick({ name, description, price, uom, minimumQty})
     this.refs.newProductText.getInputNode().value = ''
     this.refs.newProductPrice.getInputNode().value = ''
     this.refs.newProductDescription.getInputNode().value = ''
@@ -44,9 +42,9 @@ export default class NewProductPanel extends Component {
         <Subheader>New Product</Subheader>
         <div className={classes.inputSection}>
           <TextField
-            floatingLabelText="New Product Text"
+            floatingLabelText="New Product Name"
             ref="newProductText"
-            onChange={({ target }) => this.setState({ text: target.value })}
+            onChange={({ target }) => this.setState({ name: target.value })}
           />
           <TextField
             floatingLabelText="New Product Description"
@@ -59,13 +57,13 @@ export default class NewProductPanel extends Component {
             onChange={({ target }) => this.setState({ price: target.value || ''})}
           />
           <TextField
-            floatingLabelText="Uom"
-            ref="uom"
+            floatingLabelText="Units of measurement"
+            ref="newProductUom"
             onChange={({ target }) => this.setState({ uom: target.value || '' })}
           />
           <TextField
             floatingLabelText="minimumQty"
-            ref="minimumQty"
+            ref="newProductMinimumQty"
             onChange={({ target }) => this.setState({ minimumQty: target.value || '' })}
           />
           

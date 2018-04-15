@@ -11,62 +11,7 @@ import CartClass from './CartClass'
 import ProductsList from './ProductsList'
 import ProductItemClass from './ProductItemClass'
 
-// let myCart = new Map();
-// let totalPrice = 0
-// function keyExists(orders,key){
-//     for (let [i, order] of Object.entries(orders)) {
-//         if (order.productId === key) {
-//             return true
-//             break
-//         }
-//     }
-// }
 
-// function updateOrder(orders,item){
-//     for (let [i, order] of Object.entries(orders)) {
-//         if (order.productId === item.productId) {
-//             order.quantity = item.quantity
-//             break
-//         }
-//     }
-// }
-
-// function checkoutCart(date,item){
-//     //console.log(date,item)
-//     if (myCart.has(date)){
-//         let orders = myCart.get(date)
-//         //check if key exists
-//         if (orders.length !== undefined) {
-//             if (keyExists(orders, item.productId)){
-//                 updateOrder(orders, item)
-//             }else{
-//             //Add to existing date
-//                 let newVal = orders.concat(item)
-//                 myCart.set(date, newVal)  
-//             }
-//         }
-//        // console.log(date,'---print cart ---', myCart.get(date))  
-//     }else{
-//         myCart.set(date,[item])
-//     }
-// }
-
-// // function onRequestCloseMenu(){
-// //     myCart = new Map();
-// // }
-
-// function cartTotal(){
-//     let values = Array.from(myCart.values())
-//     console.log('cart::', values)
-//     //console.log('prod::', this.props.products)
-
-//     values.forEach((item, index) => {
-//         console.log('--item--', item)
-//         //this.setState({ totalPrice: this.state.totalPrice + this.getProductPrice(item[index].productId, item[index].quantity) })
-//         totalPrice = totalPrice + getProductPrice(item[index].productId, item[index].quantity)
-//     })
-//     console.log('totalPrice::', totalPrice)
-// }
 
 const customContentStyle = {
     width: '100%',

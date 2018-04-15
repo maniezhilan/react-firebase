@@ -7,13 +7,20 @@ import {
   firebaseConnect,
   isLoaded,
   pathToJS,
-  dataToJS // needed for full list and once
-  // orderedToJS, // needed for ordered list
-  // populatedDataToJS // needed for populated list
+  dataToJS
 } from 'react-redux-firebase'
 import CircularProgress from 'material-ui/CircularProgress'
 import Snackbar from 'material-ui/Snackbar'
 import { List } from 'material-ui/List'
+import {
+  Table,
+  TableBody,
+  TableHeader,
+  TableHeaderColumn,
+  TableRow,
+  TableRowColumn,
+} from 'material-ui/Table';
+
 import Paper from 'material-ui/Paper'
 import Subheader from 'material-ui/Subheader'
 import DatePicker from 'material-ui/DatePicker';
@@ -25,17 +32,13 @@ import classes from './HomeContainer.scss'
 import RaisedButton from 'material-ui/RaisedButton'
 import FlatButton from 'material-ui/FlatButton';
 import { pick } from 'lodash'
-
-// const populates = [{ child: 'owner', root: 'users', keyProp: 'uid' }]
+import Delete from 'material-ui/svg-icons/action/delete'
+import { formatDate, getDateRange} from '../../../utils/dateUtil'
 
 @firebaseConnect([
-  // 'todos' // sync full list of todos
-  // { path: 'todos', type: 'once' } // for loading once instead of binding
-  { path: 'products', queryParams: ['orderByKey', 'limitToLast=5'] }, // 10 most recent
-  { path: 'menus', queryParams: ['orderByKey', 'limitToLast=5'] }, // 10 most recent
-  { path: 'orders', queryParams: ['orderByKey', 'limitToLast=10'] }
-  // { path: 'todos', populates } // populate
-  // { path: 'todos', storeAs: 'myTodos' } // store elsewhere in redux
+  { path: 'products', queryParams: ['orderByKey','limitToLast=100']},
+  { path: 'menus', queryParams: ['orderByKey', 'limitToLast=20'] },
+  { path: 'orders', queryParams: ['orderByKey', 'limitToLast=20'] }
 ])
 @connect(({ firebase }) => ({
   auth: pathToJS(firebase, 'auth'),
@@ -43,11 +46,6 @@ import { pick } from 'lodash'
   products: dataToJS(firebase, 'products'),
   menus: dataToJS(firebase, 'menus'),
   orders: dataToJS(firebase, 'orders'),
-  
-  // todos: orderedToJS(firebase, 'todos') // if looking for array
-  // todos: dataToJS(firebase, 'myTodos'), // if using storeAs
-  // todos: populatedDataToJS(firebase, 'todos', populates), // if populating
-  // todos: orderedToJS(firebase, '/todos') // if using ordering such as orderByChild
 }))
 export default class Home extends Component {
   static propTypes = {
@@ -65,10 +63,12 @@ export default class Home extends Component {
       uid: PropTypes.string,
       email: PropTypes.string
     }),
-    uploadedFiles: PropTypes.oneOfType([
-      PropTypes.object, // object if using dataToJS
-      PropTypes.array // array if using orderedToJS
-    ])
+    
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    onEditClick: PropTypes.func,
+    onDeleteClick: PropTypes.func,
+    onSelectClick: PropTypes.func,
+    account: PropTypes.object,
   }
 
   constructor(props,context){
@@ -93,8 +93,6 @@ export default class Home extends Component {
     this.createMenu = this.createMenu.bind(this)
     this.onRequestClose = this.onRequestClose.bind(this)
     this.onRequestCloseMenu = this.onRequestCloseMenu.bind(this)
-    //this.handleDailyMenuNameChange = this.handleDailyMenuNameChange.bind(this)
-    //this.handleDailyMenuQtyChange = this.handleDailyMenuQtyChange.bind(this)
 }
 
   handleNameChange = (evt) => {
@@ -128,7 +126,7 @@ export default class Home extends Component {
 
 
   handleAddDailyMenu = () => {
-    this.setState({ dailyMenus: this.state.dailyMenus.concat([{ name: '', quantity: '', price:0 }]) });
+    this.setState({ dailyMenus: this.state.dailyMenus.concat([{ name: '', quantity: '', price:0, uom:'', minimumQty: 0 }]) });
   }
 
   handleRemoveDailyMenu = (idx) => () => {
@@ -193,6 +191,7 @@ export default class Home extends Component {
     if(newProduct.price === undefined) {
     	newProduct.price = '';
     }
+    
 
     // attach a timestamp
     newProduct.createdAt = this.props.firebase.database.ServerValue.TIMESTAMP
@@ -232,13 +231,11 @@ export default class Home extends Component {
 
   createMenu = () =>{
     this.setState({showMenuModal: !this.state.showMenuModal})
-    //construct the menu
     let menu = this.state.menu
     menu.startDate = this.state.startDate
     menu.endDate = this.state.endDate
     menu.selectedProducts = this.state.selectedProducts
     menu.dates = this.getDateRange(menu.startDate, menu.endDate)
-    //console.log(menu.selectedProducts);
   }
 
   dataSourceConfig = {
@@ -256,45 +253,10 @@ export default class Home extends Component {
     this.props.firebase.pushWithMeta('/menus',this.state.menu)
   }
 
-  //https://stackoverflow.com/questions/3552461/how-to-format-a-javascript-date
-  formatDate = (date) => {
-    let options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    return date.toLocaleDateString("en-US",options)
-  }
-
-  
-  //https://stackoverflow.com/questions/4413590/javascript-get-array-of-dates-between-2-dates/15882220
-  getDateRange = (startDate, endDate) => {
-
-    Date.prototype.addDays = function (days) {
-      var date = new Date(this.valueOf());
-      date.setDate(date.getDate() + days);
-      return date;
-    }  
-
-      let addFn = Date.prototype.addDays;
-      let interval = 1;
-
-      var retVal = [];
-      var current = new Date(startDate);
-
-      while (current <= endDate) {
-        retVal.push(this.formatDate(new Date(current)))
-        current = addFn.call(current, interval);
-      }
-    return retVal;
-  }
-  
-
   render() {
-    const { products,orders } = this.props
-    const { error } = this.state
-    const { account} = this.props
-    const { editProductModal } = this.state
-    const { showMenuModal } = this.state
-    const { product } = this.state
-    const { selectedProducts } = this.state
-    //console.log(product)
+    const { products, orders, account } = this.props
+    const { error, editProductModal, showMenuModal, product, selectedProducts } = this.state
+
     return (
       <div
         className={classes.bg}
@@ -309,13 +271,50 @@ export default class Home extends Component {
         ) : null}
         <div className={classes.info}>
           <div className={classes.centered}>
-             <a href="/menus">
-              <img className={classes.tile} src="https://firebasestorage.googleapis.com/v0/b/krabby-2017.appspot.com/o/vtile.png?alt=media&token=3887a9f7-c712-4c8b-93f9-ffb656b46a52"/>
-             </a>
+             <h1>Customer Name & Logo</h1>
           </div>
         </div>
         <div className={classes.products}>
 
+          {
+            account && account.rolename === 'admin' && !editProductModal &&
+            <div>
+              <NewProductPanel onNewClick={this.handleAdd} disabled={false} />
+              <Table>
+                <TableHeader adjustForCheckbox={false}>
+                  <TableRow>
+                    <TableHeaderColumn>Name</TableHeaderColumn>
+                    <TableHeaderColumn>Description</TableHeaderColumn>
+                    <TableHeaderColumn>Price</TableHeaderColumn>
+                    <TableHeaderColumn>Unit</TableHeaderColumn>
+                    <TableHeaderColumn>Minimum</TableHeaderColumn>
+                    <TableHeaderColumn>Edit</TableHeaderColumn>
+                    <TableHeaderColumn>Delete</TableHeaderColumn>
+                  </TableRow>
+                </TableHeader>
+                <TableBody displayRowCheckbox={false}>
+                  {products &&
+                    map(products, (product, id) => (
+                      <TableRow>
+                        <TableRowColumn>{product.name}</TableRowColumn>
+                        <TableRowColumn>{product.description}</TableRowColumn>
+                        <TableRowColumn>$ {product.price}</TableRowColumn>
+                        <TableRowColumn>{product.uom}</TableRowColumn>
+                        <TableRowColumn>{product.minimumQty}</TableRowColumn>
+                        <TableRowColumn>
+                        <FlatButton label="Edit" secondary={true} onClick={() => this.displayProduct(product, product._key || id)}>
+
+                        </FlatButton>
+                        </TableRowColumn>
+                        <TableRowColumn>
+                        <Delete onClick={() => {if (confirm(`Delete the product ${product.name} ?`)) this.deleteProduct(product._key || id)}}/>
+                        </TableRowColumn>
+                      </TableRow>
+                    ))}
+                </TableBody>
+              </Table>
+            </div>
+          }
           {editProductModal && (
             <EditProductDialog
               open={editProductModal}
@@ -324,68 +323,9 @@ export default class Home extends Component {
               onChange={this.updateProduct}
               onRequestClose={this.onRequestClose}
             />
-            
-          )}
-
-          {showMenuModal && (
-            <MenuDialog
-              open={showMenuModal}
-              onSubmit={this.saveMenu}
-              onChange={this.updateProduct}
-              onRequestCloseMenu={this.onRequestCloseMenu}
-              menu={this.state.menu}
-              formatDate={this.formatDate}
-              dataSource={this.state.selectedProducts}
-              dataSourceConfig={this.dataSourceConfig}
-              searchText={this.state.searchText}
-              handleAddDailyMenu={this.handleAddDailyMenu} 
-              handleRemoveDailyMenu={this.handleRemoveDailyMenu}
-              handleDailyMenuQtyChange={this.handleDailyMenuQtyChange}
-              handleDailyMenuNameChange={this.handleDailyMenuNameChange}    
-              dailyMenu={this.state.dailyMenus}        
-            />
 
           )}
-
-          {account && account.rolename === 'admin' && !editProductModal &&
-            <NewProductPanel onNewClick={this.handleAdd} disabled={false} /> 
-        }
-         
-          {/* <Paper className={classes.paper}>
-              <Subheader>Products</Subheader>
-              <List className={classes.list}>
-                {products &&
-                  map(products, (product, id) => (
-                    <Product
-                      key={id}
-                      id={id}
-                      product={product}
-                      account={account}
-                      onSelectClick={this.selectProduct}
-                      onDeleteClick={this.deleteProduct}
-                      onEditClick={this.displayProduct}
-                    />
-                  ))}
-              </List>
-            </Paper> */}
-            
-          {/* <Paper className={classes.paper}> //TODO: Move to orders page
-            <Subheader>Orders</Subheader>
-            <List className={classes.list}>
-              {orders &&
-                map(orders, (order, users) => (
-                  <div> <h3>{users}</h3>
-                  {map(order,(item,key) => (
-                      <div key={key}><h4>{key}</h4>
-                      {map(item, (prod, idx) => (
-                        <div key={idx}>{prod.name} : {prod.quantity}</div>
-                      ))}
-                      </div>
-                  ))}
-                  </div>
-                ))}
-            </List>
-          </Paper>   */}
+          
         </div>
       </div>
     )

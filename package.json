@@ -19,11 +19,11 @@
     "url": "git+https://github.com/maniezhilan/krabby.git"
   },
   "author": "testuser (https://github.com/maniezhilan)",
-  "license": "NA",
+  "license": "MIT",
   "dependencies": {
     "babel-preset-es2015": "^6.24.1",
     "lodash": "^4.17.4",
-    "material-ui": "^0.19.1",
+    "material-ui": "^0.20.0",
     "normalize.css": "^7.0.0",
     "object-assign": "^4.1.1",
     "promise": "^7.1.1",

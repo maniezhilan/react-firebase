@@ -102,12 +102,6 @@ export default class Navbar extends Component {
         <Link to={LOGIN_PATH}>
           <FlatButton label="Login" style={buttonStyle} />
         </Link>
-        {/* <Link to={MENU_PATH}>
-          <FlatButton label="Menu" style={buttonStyle} />
-        </Link>
-        <Link to={ORDER_PATH}>
-          <FlatButton label="Orders" style={buttonStyle} />
-        </Link> */}
       </div>
     )
 
@@ -132,11 +126,8 @@ export default class Navbar extends Component {
     return (
       <AppBar
         title={
-          // <Link to={authExists ? MENU_PATH : '/'} className={classes.brand}>
-          //   Virundhu  
-          // </Link>
           <Link to={'/'} className={classes.brand}>
-            Virundhu
+            Krabby Platform
           </Link>
           
         }

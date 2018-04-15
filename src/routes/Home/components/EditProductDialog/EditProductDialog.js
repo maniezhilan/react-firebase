@@ -33,8 +33,8 @@ export const EditProductDialog = ({
     ]}>
       <form onSubmit={handleEdit} className={classes.inputs}>
         <TextField
-        name="text"
-        value={product.text}
+        name="name"
+        value={product.name}
         floatingLabelText="Name"
         onChange={onChange}
       />
@@ -49,11 +49,11 @@ export const EditProductDialog = ({
         <TextField
           floatingLabelText="Price"
           name="price"
-          value={product.price}
+          value={`$ `+product.price}
           onChange={onChange}
         />
         <TextField
-          floatingLabelText="Uom"
+          floatingLabelText="Unit of measurement"
           name="uom"
           value={product.uom}
           onChange={onChange}
