@@ -94,7 +94,8 @@ export default class Menus extends Component {
       count:0,
       item: [{ productId: '', name: '', quantity: 0, price: 0 }],
       myCart : new Map(),
-      totalPrice: 0
+      totalPrice: 0,
+      menuExists: false
 
     }
     this.handleRemoveDailyMenu = this.handleRemoveDailyMenu.bind(this)
@@ -136,14 +137,23 @@ export default class Menus extends Component {
     this.setState({
       open: false,
     });
+    this.setState({
+      menuExists: false,
+    });
   };
 
 
   
   handleDateChange = (event, date) => {
-    this.setState({
-      date: date
-    });
+    let day = formatDate(date)
+    console.log(this.props.menus, day,this.props.menus.hasOwnProperty(day))
+    if (this.props.menus.hasOwnProperty(day)){
+      this.setState({menuExists:true})
+    }
+      this.setState({
+        date: date
+      });
+    
   };
 
 
@@ -439,9 +449,9 @@ saveOrders=() => {
   render() {
     
     const { menus, auth, account, products, orders, handleSubmit } = this.props
-    const { showMenuForm, searchText, dailyMenus, open, edit, date, item, openCart, onRequestCloseMenu, orderDates, count } = this.state
+    const { showMenuForm, searchText, menuExists, dailyMenus, open, edit, date, item, openCart, onRequestCloseMenu, orderDates, count } = this.state
     // Menu Route is being loaded
-    //console.log('menus', menus)
+    console.log('date', date)
    
     if (this.props.children) {
       // pass all props to children routes
@@ -534,10 +544,10 @@ saveOrders=() => {
               this.state.date
             }
 
-            {account && account.rolename === 'admin' && open &&
+            {account && account.rolename === 'admin' && menuExists &&
               <Snackbar
-                open={open}
-                message={`Menu already exists for ${formatDate(date)}`}
+              open={menuExists}
+              message={`Menu already exists for ${formatDate(date)} .`}
                 autoHideDuration={4000}
                 onRequestClose={this.handleRequestClose}
               />
@@ -546,7 +556,6 @@ saveOrders=() => {
             <RaisedButton label="Create Menu" primary={true}
             onClick={this.createMenu}/>
             } 
-            {console.log(this.state.edit)}
             {account && account.rolename === 'admin' && showMenuForm && (
               <form className={classes.inputs}>
                 <List className={classes.list}>
