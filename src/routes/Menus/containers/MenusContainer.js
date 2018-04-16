@@ -81,7 +81,7 @@ export default class Menus extends Component {
       error: null,
       menu: Object.assign({}, this.props.menu),
       date: Object.assign({}, this.props.date),
-      dailyMenus: [{ productId:'',name: '', quantity: 0, searchText: '', price:0, img: '', uom: ''}],
+      dailyMenus: [{ productId:'',name: '', quantity: 0, searchText: '', price:0, img: '', uom: '', minimumQty:0}],
       dailyOrders: [{ productId: '', name: '', quantity: 0, price: 0}],
       orderDates: [],
       showMenuForm: false,
@@ -146,8 +146,7 @@ export default class Menus extends Component {
   
   handleDateChange = (event, date) => {
     let day = formatDate(date)
-    console.log(this.props.menus, day,this.props.menus.hasOwnProperty(day))
-    if (this.props.menus.hasOwnProperty(day)){
+    if (this.props.menus && this.props.menus.hasOwnProperty(day)){
       this.setState({menuExists:true})
     }
       this.setState({
@@ -163,7 +162,8 @@ export default class Menus extends Component {
       return { ...dailyMenu, productId: evt.id, name: evt.name, searchText: evt.name,
          price: this.getProductPriceById(evt.id),
          img: this.getProductImgById(evt.id),
-         uom: this.getProductUom(evt.id)
+         uom: this.getProductUom(evt.id),
+         minimumQty: this.getProductMinimumQty(evt.id)
         };
     });
     this.setState({dailyMenus: newDailyMenus});
@@ -180,7 +180,7 @@ export default class Menus extends Component {
 
 
   handleAddDailyMenu = () => {
-    this.setState({ dailyMenus: this.state.dailyMenus.concat([{ productId: '', name: '', quantity: 0, searchText: '', price: 0, img:'', uom:'' }]) });
+    this.setState({ dailyMenus: this.state.dailyMenus.concat([{ productId: '', name: '', quantity: 0, searchText: '', price: 0, img:'', uom:'', minimumQty: 0 }]) });
   }
 
   handleRemoveDailyMenu = (idx) => () => {
@@ -345,9 +345,9 @@ splitString = (stringToSplit, separator) => {
 }
 
 getProductPrice = (productId, quantity) => {
-  console.log(this.props.products, productId, quantity, this.props.products[productId].price * quantity)
+  //console.log(this.props.products, productId, quantity, this.props.products[productId].price * quantity)
 
-  return this.props.products[productId].price * quantity
+  return this.props.products[productId].price * parseFloat(quantity)
 }
 
   getProductPriceById = (productId) => {
@@ -362,6 +362,11 @@ getProductPrice = (productId, quantity) => {
 
   getProductUom = (productId) => {
     return this.props.products[productId].uom || ''
+  }
+
+  getProductMinimumQty = (productId) => {
+    console.log(this.props.products[productId].minimumQty)
+    return this.props.products[productId].minimumQty || 0
   }
 
   cartTotal = (date,params) => {
@@ -443,7 +448,9 @@ saveOrders=() => {
     this.setState({totalPrice:0})
   }
 
-  
+  addToCart = (idx, item) => {
+    console.log(idx,item)
+  }
 
   
   render() {
@@ -451,7 +458,7 @@ saveOrders=() => {
     const { menus, auth, account, products, orders, handleSubmit } = this.props
     const { showMenuForm, searchText, menuExists, dailyMenus, open, edit, date, item, openCart, onRequestCloseMenu, orderDates, count } = this.state
     // Menu Route is being loaded
-    console.log('date', date)
+    //console.log('date', date)
    
     if (this.props.children) {
       // pass all props to children routes
@@ -511,12 +518,13 @@ saveOrders=() => {
                           <GridTile
                             key={id}
                             title={item.name}
-                            // subtitle={<span> <b>{(item.quantity === '0') ? 'Sold out' : item.quantity}</b><br/>{idx}</span>}
-                            subtitle={<span>{idx}</span>}
+                            //subtitle={<span> <b>{(item.quantity === '0') ? 'Sold out' : item.quantity}</b><br/>{idx}</span>}
+                            //subtitle={<span>{idx}</span>}
                             //actionIcon={<IconButton onClick={() => this.addToCart(idx,item,1)}>Order</IconButton>}
-                            //actionPosition="right"
+                            actionPosition="right"
                             titlePosition="bottom"
                             onClick={this.openCart}
+                            //onClick={() => this.addToCart(idx, item)}
                             style={styles.gridTile}
                             titlePosition="top"
                             titleBackground="linear-gradient(to bottom, rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.3) 70%,rgba(0,0,0,0) 100%)"

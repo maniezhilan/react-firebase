@@ -54,7 +54,7 @@ export default class NewProductPanel extends Component {
           <TextField
             floatingLabelText="New Product Price"
             ref="newProductPrice"
-            onChange={({ target }) => this.setState({ price: target.value || ''})}
+            onChange={({ target }) => this.setState({ price: parseFloat(target.value) || 0})}
           />
           <TextField
             floatingLabelText="Units of measurement"
@@ -64,7 +64,7 @@ export default class NewProductPanel extends Component {
           <TextField
             floatingLabelText="minimumQty"
             ref="newProductMinimumQty"
-            onChange={({ target }) => this.setState({ minimumQty: target.value || '' })}
+            onChange={({ target }) => this.setState({ minimumQty: parseFloat(target.value) || 0 })}
           />
           
           <IconButton

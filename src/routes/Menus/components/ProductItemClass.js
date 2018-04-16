@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import Product from './Product'
 import AddToCartButton from './AddToCartButton'
 import { TextField } from 'redux-form-material-ui'
-
+import Divider from 'material-ui/Divider';
 
 
 
@@ -61,6 +61,7 @@ export default class ProductItemClass extends Component {
                      type="button"
                  /> : 'Sold Out'
                  }
+                <Divider/>    
             </div>
         )
     }
