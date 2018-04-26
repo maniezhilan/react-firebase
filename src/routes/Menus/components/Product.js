@@ -1,14 +1,19 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import Divider from 'material-ui/Divider';
 
 
 
-
-const Product = ({ price, quantity, title, minimumQty, uom}) => {
+const Product = ({ price, quantity, description, title, minimumQty, uom}) => {
  
    return ( 
         <div>
-           <b>{title}</b>  $:{price} for {minimumQty} {uom}
+           <b>{title}</b> 
+           <Divider/>
+           {description}
+           <Divider />
+           <b>Price</b>: $:{price}
+           <Divider />
         </div>
    )
 }

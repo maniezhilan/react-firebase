@@ -31,12 +31,12 @@ module.exports = {
   // ======================================================
   production: config => ({
     compiler_public_path: '/',
-    compiler_fail_on_warning: false,
+    compiler_fail_on_warning: true,
     compiler_hash_type: 'chunkhash',
     compiler_devtool: null,
     compiler_stats: {
-      chunks: true,
-      chunkModules: true,
+      chunks: false,
+      chunkModules: false,
       colors: true
     },
     firebase: {

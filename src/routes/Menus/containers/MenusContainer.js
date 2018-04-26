@@ -31,6 +31,7 @@ import FlatButton from 'material-ui/FlatButton';
 import SvgIconAddShoppingCart from "material-ui/svg-icons/action/add-shopping-cart";
 import CartDialog from "../components/CartDIalog"
 import { formatDate, getDateRange } from '../../../utils/dateUtil'
+import { AddToCartDialog } from '../components/AddToCartDIalog';
 
 
 const styles = {
@@ -95,7 +96,9 @@ export default class Menus extends Component {
       item: [{ productId: '', name: '', quantity: 0, price: 0 }],
       myCart : new Map(),
       totalPrice: 0,
-      menuExists: false
+      menuExists: false,
+      selectedProduct: Object.assign({}, this.props.product),
+      selectedDate: Object.assign({}, this.props.date),
 
     }
     this.handleRemoveDailyMenu = this.handleRemoveDailyMenu.bind(this)
@@ -163,6 +166,7 @@ export default class Menus extends Component {
          price: this.getProductPriceById(evt.id),
          img: this.getProductImgById(evt.id),
          uom: this.getProductUom(evt.id),
+         description: this.getProductDescById(evt.id),
          minimumQty: this.getProductMinimumQty(evt.id)
         };
     });
@@ -369,6 +373,10 @@ getProductPrice = (productId, quantity) => {
     return this.props.products[productId].minimumQty || 0
   }
 
+  getProductDescById = (productId) => {
+    return this.props.products[productId].description || ''
+  }
+
   cartTotal = (date,params) => {
     //TODO: check if totalPrice needs to be '-' or '+' based on quantity more or quanity less  
     let values = Array.from(this.state.myCart.values())
@@ -449,14 +457,16 @@ saveOrders=() => {
   }
 
   addToCart = (idx, item) => {
-    console.log(idx,item)
+    this.setState({ openCart: !this.state.openCart })
+    this.setState({selectedProduct: item})
+    this.setState({selectedDate: idx})
   }
 
   
   render() {
     
     const { menus, auth, account, products, orders, handleSubmit } = this.props
-    const { showMenuForm, searchText, menuExists, dailyMenus, open, edit, date, item, openCart, onRequestCloseMenu, orderDates, count } = this.state
+    const { showMenuForm, searchText, menuExists, dailyMenus, selectedDate, selectedProduct, selectedProducts, open, edit, date, item, openCart, onRequestCloseMenu, orderDates, count } = this.state
     // Menu Route is being loaded
     //console.log('date', date)
    
@@ -523,8 +533,8 @@ saveOrders=() => {
                             //actionIcon={<IconButton onClick={() => this.addToCart(idx,item,1)}>Order</IconButton>}
                             actionPosition="right"
                             titlePosition="bottom"
-                            onClick={this.openCart}
-                            //onClick={() => this.addToCart(idx, item)}
+                            //onClick={this.openCart}
+                            onClick={() => this.addToCart(idx, item)}
                             style={styles.gridTile}
                             titlePosition="top"
                             titleBackground="linear-gradient(to bottom, rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.3) 70%,rgba(0,0,0,0) 100%)"
@@ -571,12 +581,13 @@ saveOrders=() => {
                     <div className="dailyMenu" key={idx}>
                       <AutoComplete
                         hintText={`Type product #${idx + 1} name`}
-                        dataSource={this.state.selectedProducts}
+                        dataSource={selectedProducts}
                         dataSourceConfig={this.dataSourceConfig}
                         openOnFocus={true}
                         onNewRequest={this.handleDailyMenuNameChange(idx)}
-                        filter={(searchText, key) => (key.indexOf(dailyMenu.searchText) !== -1)}
-                        searchText={(this.state.edit) ? dailyMenu.name : this.state.searchText}
+                        searchText={(edit) ? dailyMenu.name : searchText}
+                        filter={(searchText, key) => (key.indexOf(dailyMenu.name) !== -1)}
+                        listStyle={{ maxHeight: 200, overflow: 'auto' }}
                       />
 
                       <TextField
@@ -601,22 +612,28 @@ saveOrders=() => {
           </Paper>
 
           {openCart &&
-            <CartDialog
-            open = {openCart}
-            onRequestCloseMenu={this.onRequestCloseMenu}
-            onRequestCloseCart={this.onRequestCloseCart}
-            menus={menus}
-            onSubmit={this.saveOrders}
-            orderDates={this.state.myCart}
-            showCart={this.checkoutCart}
-            cartCount={count}
-            showCartContent={this.showCartContent}
-            checkoutCart={this.checkoutCart}
-            myCart={this.state.myCart}
-            cartTotal={this.cartTotal}
-            totalPrice={this.state.totalPrice}
+            // <CartDialog
+            // open = {openCart}
+            // onRequestCloseMenu={this.onRequestCloseMenu}
+            // onRequestCloseCart={this.onRequestCloseCart}
+            // menus={menus}
+            // onSubmit={this.saveOrders}
+            // orderDates={this.state.myCart}
+            // showCart={this.checkoutCart}
+            // cartCount={count}
+            // showCartContent={this.showCartContent}
+            // checkoutCart={this.checkoutCart}
+            // myCart={this.state.myCart}
+            // cartTotal={this.cartTotal}
+            // totalPrice={this.state.totalPrice}
+            // />
+            <AddToCartDialog
+              open={openCart}
+              onRequestCloseMenu={this.onRequestCloseMenu}
+              onRequestCloseCart={this.onRequestCloseCart}
+              product={selectedProduct}
+              date={selectedDate}
             />
-            
           }  
           
          
