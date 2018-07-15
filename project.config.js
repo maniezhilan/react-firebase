@@ -56,7 +56,7 @@ module.exports = {
     },
     production: {
       firebase: {
-        apiKey: ',
+        apiKey: 'YourAPIKEY',
         authDomain: 'krabby-2017.firebaseapp.com',
         databaseURL: 'https://krabby-2017.firebaseio.com',
         projectId: 'krabby-2017',
