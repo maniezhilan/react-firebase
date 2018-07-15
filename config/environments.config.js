@@ -11,12 +11,12 @@ module.exports = {
   development: config => ({
     compiler_public_path: `http://${config.server_host}:${config.server_port}/`,
     firebase: {
-      apiKey: 'AIzaSyD5ddO8MljntHr1rp9fUqbyjsI_doINE_o',
+      apiKey: 'YOURAPIKEY',
       authDomain: 'krabby-2017.firebaseapp.com',
       databaseURL: 'https://krabby-2017.firebaseio.com',
       projectId: 'krabby-2017',
       storageBucket: 'krabby-2017.appspot.com',
-      messagingSenderId: '541115055776'
+      messagingSenderId: 'YOURAPIKEY'
     },
     reduxFirebase: {
       userProfile: 'users', // root that user profiles are written to
@@ -40,12 +40,12 @@ module.exports = {
       colors: true
     },
     firebase: {
-      apiKey: 'AIzaSyD5ddO8MljntHr1rp9fUqbyjsI_doINE_o',
+      apiKey: 'YOURAPIKEY',
       authDomain: 'krabby-2017.firebaseapp.com',
       databaseURL: 'https://krabby-2017.firebaseio.com',
       projectId: 'krabby-2017',
       storageBucket: 'krabby-2017.appspot.com',
-      messagingSenderId: '541115055776'
+      messagingSenderId: 'YOURAPIKEY'
     },
     reduxFirebase: {
       userProfile: 'users', // root that user profiles are written to
