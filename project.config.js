@@ -41,12 +41,12 @@ module.exports = {
   ci: {
     development: {
       firebase: {
-        apiKey: 'AIzaSyD5ddO8MljntHr1rp9fUqbyjsI_doINE_o',
+        apiKey: 'YourAPIKEY',
         authDomain: 'krabby-2017.firebaseapp.com',
         databaseURL: 'https://krabby-2017.firebaseio.com',
         projectId: 'krabby-2017',
         storageBucket: 'krabby-2017.appspot.com',
-        messagingSenderId: '541115055776'
+        messagingSenderId: ''
       },
       reduxFirebase: {
         userProfile: 'users', // root that user profiles are written to
@@ -56,12 +56,12 @@ module.exports = {
     },
     production: {
       firebase: {
-        apiKey: 'AIzaSyD5ddO8MljntHr1rp9fUqbyjsI_doINE_o',
+        apiKey: ',
         authDomain: 'krabby-2017.firebaseapp.com',
         databaseURL: 'https://krabby-2017.firebaseio.com',
         projectId: 'krabby-2017',
         storageBucket: 'krabby-2017.appspot.com',
-        messagingSenderId: '541115055776'
+        messagingSenderId: ''
       },
       reduxFirebase: {
         userProfile: 'users',
